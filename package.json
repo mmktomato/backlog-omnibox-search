@@ -1,0 +1,31 @@
+{
+  "name": "backlog-omnibox-search",
+  "version": "0.0.1",
+  "description": "Search backlog issues by your omnibox.",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel watch src/background.ts --public-url=/dist"
+  },
+  "author": "mmktomato",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/firefox-webext-browser": "^70.0.1",
+    "parcel-bundler": "^1.12.4",
+    "parcel-plugin-web-ext-tool": "^0.1.2",
+    "typescript": "^3.8.3",
+    "web-ext": "^4.1.0",
+    "web-ext-types": "^3.2.1"
+  },
+  "dependencies": {
+    "webextension-polyfill": "^0.6.0"
+  },
+  "browserslist": [
+    "last 2 Chrome versions"
+  ],
+  "webExt": {
+    "run": {
+      "target": ["chromium", "firefox-desktop"],
+      "startUrl": ["chrome://extensions", "about:debugging#/runtime/this-firefox"]
+    }
+  }
+}

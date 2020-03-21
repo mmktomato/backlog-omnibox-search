@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["EXNext", "dom"],
+    "allowJs": false,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "baseUrl": "./src",
+    "esModuleInterop": true
+  },
+  "include": [
+    "src/**/*"
+  ]
+}

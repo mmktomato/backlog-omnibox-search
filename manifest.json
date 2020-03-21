@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+  "version": "0.0.1",
+  "name": "Backlog Omnibox Search",
+  "description": "Search backlog issues by your omnibox.",
+  "background": {
+    "scripts": ["dist/background.js"]
+  },
+  "permissions": [
+    "tabs",
+    "identity"
+  ],
+  "omnibox": {
+    "keyword": "b"
+  },
+  "key": "testexamplecomtestexamplecomtest",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "test@example.com"
+    }
+  }
+}
