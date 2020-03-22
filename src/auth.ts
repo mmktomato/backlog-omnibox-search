@@ -4,28 +4,34 @@ const clientSecret = process.env.CLIENT_SECRET!;
 
 const _browser: typeof browser = require("webextension-polyfill");
 
-export const authorize = () => {
+export interface Tokens {
+  accessToken: string;
+  expiresIn: number;
+  refreshToken: string;
+  localTimestamp: number;
+}
+
+export const authorize = async () => {
   const redirectUrl = _browser.identity.getRedirectURL();
+  // Firefox: https://567159d622ffbb50b11b0efd307be358624a26ee.extensions.allizom.org/
+  // Chrome: https://ahflghaojahgadhdpbeheifnjlaemcld.chromiumapp.org/
+
   const url = new URL("/OAuth2AccessRequest.action", baseUrl);
   url.searchParams.set("response_type", "code");
   url.searchParams.set("client_id", clientId);
   url.searchParams.set("redirect_uri", redirectUrl);
   url.searchParams.set("state", "ssstate");
 
-  _browser.identity.launchWebAuthFlow({ url: url.toString(), interactive: true })
-    .then(res => {
-      console.log(res);
-      const code = new URL(res).searchParams.get("code");
-      if (code) {
-        getAccessToken(redirectUrl, code);
-      } else {
-        // TODO; fix this.
-        console.error("No code found.");
-      }
-    });
+  const res = await _browser.identity.launchWebAuthFlow({ url: url.toString(), interactive: true });
+  const code = new URL(res).searchParams.get("code");
+
+  if (!code) {
+    throw new Error("No code found.");
+  }
+  return await getAccessToken(redirectUrl, code);
 };
 
-const getAccessToken = (redirectUrl: string, code: string) => {
+const getAccessToken = async (redirectUrl: string, code: string) => {
   const url = new URL("/api/v2/oauth2/token", baseUrl);
   const body = new URLSearchParams();
   body.set("grant_type", "authorization_code");
@@ -34,12 +40,27 @@ const getAccessToken = (redirectUrl: string, code: string) => {
   body.set("client_id", clientId);
   body.set("client_secret", clientSecret);
 
-  fetch(url.toString(), {
+  const timestamp = new Date().getTime();
+  const res = await fetch(url.toString(), {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded"},
     body: body
-  }).then(async (res) => {
-    const json = await res.json();
-    console.log(json);
   });
+
+  const obj = await res.json();  // TODO: assertion
+
+  return {
+    accessToken: obj.access_token,
+    expiresIn: obj.expires_in,
+    refreshToken: obj.refresh_token,
+    localTimestamp: timestamp,
+  } as Tokens;
+};
+
+export const isTokenAvailable = (tokens: Tokens) => {
+  const now = new Date().getTime();
+  const elapsedInMsec = now - tokens.localTimestamp;
+  const thresholdInSec = 60;
+
+  return elapsedInMsec <= ((tokens.expiresIn - thresholdInSec) * 1000);
 };

@@ -1,4 +1,5 @@
-import { authorize } from "./auth";
+import { authorize, isTokenAvailable } from "./auth";
+import { getTokens, setTokens } from "./storage";
 
 const _browser: typeof browser = require("webextension-polyfill");
 
@@ -8,17 +9,34 @@ const setDefaultSuggestion = (text: string) => {
 
 // setDefaultSuggestion("Type search keyword.");
 
-_browser.omnibox.onInputStarted.addListener(() => {
-  setDefaultSuggestion("Type search keyword.");
+_browser.omnibox.onInputStarted.addListener(async () => {
+  setDefaultSuggestion("Checking tokens...");
 
-  console.log(_browser.identity.getRedirectURL());
-  // Firefox: https://567159d622ffbb50b11b0efd307be358624a26ee.extensions.allizom.org/
-  // Chrome: https://ahflghaojahgadhdpbeheifnjlaemcld.chromiumapp.org/
+  try {
+    const tokens = await getTokens();
+    if (tokens) {
+      if (!isTokenAvailable(tokens)) {
+        setDefaultSuggestion("Refreshing tokens...");
 
-  authorize();
+        // TODO: refresh
+        throw new Error("fix this");
+      }
+    } else {
+      setDefaultSuggestion("Acquiring tokens...");
+
+      const newTokens = await authorize();
+      await setTokens(newTokens);
+    }
+    setDefaultSuggestion("Type search keyword.");
+  } catch (ex) {
+    console.error(ex);
+    setDefaultSuggestion(`Error (${(ex as Error).name}: ${(ex as Error).message})`);
+  }
 });
 
 _browser.omnibox.onInputChanged.addListener((text, suggest) => {
+  // TODO: Do nothing if acquiring or refreshing token.
+
   // TODO: debounce
   //       https://www.npmjs.com/package/ts-debounce
   //       https://www.npmjs.com/package/lodash.debounce
