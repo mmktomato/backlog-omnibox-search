@@ -1,5 +1,9 @@
+import { debounce } from 'ts-debounce';
+
+import type { SuggestResult } from "./type";
 import { authorize, isTokenAvailable } from "./auth";
 import { getTokens, setTokens } from "./storage";
+import { getIssues } from "./backlog";
 
 const _browser: typeof browser = require("webextension-polyfill");
 
@@ -7,12 +11,20 @@ const setDefaultSuggestion = (text: string) => {
   _browser.omnibox.setDefaultSuggestion({ description: text || " " });
 };
 
-// setDefaultSuggestion("Type search keyword.");
+const handleError = (ex: unknown) => {
+  console.error(ex);
+
+  if (ex instanceof Error) {
+    setDefaultSuggestion(`Error (${ex.name}: ${ex.message}).`);
+  } else {
+    setDefaultSuggestion("Unexpected error.");
+  }
+};
 
 _browser.omnibox.onInputStarted.addListener(async () => {
-  setDefaultSuggestion("Checking tokens...");
-
   try {
+    setDefaultSuggestion("Checking tokens...");
+
     const tokens = await getTokens();
     if (tokens) {
       if (!isTokenAvailable(tokens)) {
@@ -29,36 +41,46 @@ _browser.omnibox.onInputStarted.addListener(async () => {
     }
     setDefaultSuggestion("Type search keyword.");
   } catch (ex) {
-    console.error(ex);
-    setDefaultSuggestion(`Error (${(ex as Error).name}: ${(ex as Error).message})`);
+    handleError(ex);
   }
 });
 
-_browser.omnibox.onInputChanged.addListener((text, suggest) => {
-  // TODO: Do nothing if acquiring or refreshing token.
+const onInputChanged = async (text: string, suggest: (suggestResults: SuggestResult[]) => void) => {
+  try {
+    // TODO: Do nothing if acquiring or refreshing token.
+    const tokens = await getTokens();
+    if (!tokens) {
+      return;
+    }
 
-  // TODO: debounce
-  //       https://www.npmjs.com/package/ts-debounce
-  //       https://www.npmjs.com/package/lodash.debounce
+    const keyword = text.trim();
+    if (!keyword) {
+      setDefaultSuggestion("Type search keyword.");
+    } else {
+      setDefaultSuggestion("Searching...");
 
-  if (!text.trim()) {
-    setDefaultSuggestion("Type search keyword.");
-  } else {
-    setDefaultSuggestion("Searching...");
-
-    setTimeout(() => {
-      suggest([
-        { description: `tes1 ${text}`, content: "con1" },
-        { description: `tes2 ${text}`, content: "con2" },
-      ]);
-      setDefaultSuggestion("Result of: " + text);
-    }, 1000);
+      const issues = await getIssues(tokens.accessToken, keyword);
+      const suggestResults = issues.map(issue => ({
+        description: `${issue.issueKey} ${issue.summary}`, content: issue.issueKey,
+      }));
+      suggest(suggestResults);
+      setDefaultSuggestion("Result of: " + keyword);
+    }
+  } catch (ex) {
+    handleError(ex);
   }
-});
+};
+const onInputChangedDebounced = debounce(onInputChanged, 250);
 
-_browser.omnibox.onInputEntered.addListener((text, disposition) => {
-  console.log(`onInputEntered: ${text}`);
-  console.log(`onInputEntered: ${disposition}`);
+_browser.omnibox.onInputChanged.addListener(onInputChangedDebounced);
+
+_browser.omnibox.onInputEntered.addListener((url, disposition) => {
+  try {
+    console.log(`onInputEntered: ${url}`);
+    console.log(`onInputEntered: ${disposition}`);
+  } catch (ex) {
+    handleError(ex);
+  }
 });
 
 // _browser.omnibox.onInputCancelled.addListener(() => {

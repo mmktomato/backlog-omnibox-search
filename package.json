@@ -17,6 +17,7 @@
     "web-ext-types": "^3.2.1"
   },
   "dependencies": {
+    "ts-debounce": "^2.0.1",
     "webextension-polyfill": "^0.6.0"
   },
   "browserslist": [
@@ -24,8 +25,14 @@
   ],
   "webExt": {
     "run": {
-      "target": ["chromium", "firefox-desktop"],
-      "startUrl": ["chrome://extensions", "about:debugging#/runtime/this-firefox"]
+      "target": [
+        "chromium",
+        "firefox-desktop"
+      ],
+      "startUrl": [
+        "chrome://extensions",
+        "about:debugging#/runtime/this-firefox"
+      ]
     }
   }
 }

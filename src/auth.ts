@@ -1,15 +1,12 @@
+import type { Tokens } from "./type";
+
+// TODO: from option.
 const baseUrl = process.env.BASE_URL!;
+
 const clientId = process.env.CLIENT_ID!;
 const clientSecret = process.env.CLIENT_SECRET!;
 
 const _browser: typeof browser = require("webextension-polyfill");
-
-export interface Tokens {
-  accessToken: string;
-  expiresIn: number;
-  refreshToken: string;
-  localTimestamp: number;
-}
 
 export const authorize = async () => {
   const redirectUrl = _browser.identity.getRedirectURL();
