@@ -18,3 +18,7 @@ export interface Issue {
   summary: string;
   issueKey: string;
 }
+
+export interface Project {
+  id: number;
+}

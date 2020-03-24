@@ -1,10 +1,10 @@
-import type { Issue } from "./type";
+import type { Issue, Project } from "./type";
 
 // TODO: from option.
 const baseUrl = process.env.BASE_URL!;
 
-// TODO: from option. It should be "project key" not "project id".
-const projectId = process.env.PROJECT_ID!
+// TODO: from option.
+const projectKey = process.env.PROJECT_KEY!
 
 const createHeaders = (accessToken: string) => ({
   "Content-Type": "application/json",
@@ -12,8 +12,10 @@ const createHeaders = (accessToken: string) => ({
 });
 
 export const getIssues = async (accessToken: string, keyword: string) => {
+  const project = await getProject(accessToken);
+
   const url = new URL("/api/v2/issues", baseUrl);
-  url.searchParams.set("projectId[0]", projectId);
+  url.searchParams.set("projectId[0]", project.id.toString());
 
   // The number of results is up to 6.
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/omnibox/onInputChanged
@@ -29,4 +31,15 @@ export const getIssues = async (accessToken: string, keyword: string) => {
   });
 
   return await res.json() as Issue[];
+};
+
+const getProject = async (accessToken: string) => {
+  const url = new URL(`/api/v2/projects/${projectKey}`, baseUrl);
+
+  const res = await fetch(url.toString(), {
+    method: "GET",
+    headers: createHeaders(accessToken),
+  });
+
+  return await res.json() as Project;
 };
