@@ -4,7 +4,7 @@
   "description": "Search backlog issues by your omnibox.",
   "main": "index.js",
   "scripts": {
-    "start": "parcel watch src/background.ts --public-url=/dist"
+    "start": "parcel watch src/background.ts src/options/options.html --public-url=/dist"
   },
   "author": "mmktomato",
   "license": "MIT",
@@ -17,6 +17,7 @@
     "web-ext-types": "^3.2.1"
   },
   "dependencies": {
+    "lit-element": "^2.3.1",
     "ts-debounce": "^2.0.1",
     "webextension-polyfill": "^0.6.0"
   },

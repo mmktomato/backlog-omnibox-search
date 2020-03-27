@@ -1,4 +1,4 @@
-import { Tokens } from "./auth";
+import { Tokens } from "./type";
 
 const _browser: typeof browser = require("webextension-polyfill");
 

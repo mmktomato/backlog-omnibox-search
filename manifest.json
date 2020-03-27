@@ -6,6 +6,10 @@
   "background": {
     "scripts": ["dist/background.js"]
   },
+  "options_ui": {
+    "browser_style": true,
+    "page": "dist/options/options.html"
+  },
   "permissions": [
     "tabs",
     "identity",
