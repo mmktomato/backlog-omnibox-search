@@ -2,8 +2,9 @@ import { debounce } from 'ts-debounce';
 
 import type { SuggestResult } from "./type";
 import { authorize, isTokenAvailable } from "./auth";
-import { getTokens, setTokens } from "./storage";
 import { getIssues } from "./backlog";
+import { getTokens, setTokens, getOptions } from "./storage";
+import { validateOptions, escapeDescription } from "./util";
 
 const _browser: typeof browser = require("webextension-polyfill");
 
@@ -34,12 +35,18 @@ _browser.omnibox.onInputStarted.addListener(async () => {
         throw new Error("fix this");
       }
     } else {
-      setDefaultSuggestion("Acquiring tokens...");
+      const options = await getOptions();
+      if (validateOptions(options)) {
+        setDefaultSuggestion("Acquiring tokens...");
 
-      const newTokens = await authorize();
-      await setTokens(newTokens);
+        const newTokens = await authorize(options);
+        await setTokens(newTokens);
+
+        setDefaultSuggestion("Type search keyword.");
+      } else {
+        setDefaultSuggestion("The configuration is not finished.");
+      }
     }
-    setDefaultSuggestion("Type search keyword.");
   } catch (ex) {
     handleError(ex);
   }
@@ -47,7 +54,11 @@ _browser.omnibox.onInputStarted.addListener(async () => {
 
 const onInputChanged = async (text: string, suggest: (suggestResults: SuggestResult[]) => void) => {
   try {
-    // TODO: Do nothing if acquiring or refreshing token.
+    // TODO: Do nothing during acquiring token, refreshing token, or configuration.
+    const options = await getOptions();
+    if (!validateOptions(options)) {
+      return;
+    }
     const tokens = await getTokens();
     if (!tokens) {
       return;
@@ -59,9 +70,13 @@ const onInputChanged = async (text: string, suggest: (suggestResults: SuggestRes
     } else {
       setDefaultSuggestion("Searching...");
 
-      const issues = await getIssues(tokens.accessToken, keyword);
+      const issues = await getIssues(tokens.accessToken, options, keyword);
+      console.log(issues.map(issue => issue.summary));
       const suggestResults = issues.map(issue => ({
-        description: `${issue.issueKey} ${issue.summary}`, content: issue.issueKey,
+        // TODO: I have to escape some chars because `description` can take XML in chrome.
+        //       What about Firefox?
+        description: escapeDescription(`${issue.issueKey} ${issue.summary}`),
+        content: issue.issueKey,
       }));
       suggest(suggestResults);
       setDefaultSuggestion("Result of: " + keyword);

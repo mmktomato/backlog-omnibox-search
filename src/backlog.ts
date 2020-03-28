@@ -1,21 +1,20 @@
-import type { Issue, Project } from "./type";
-
-// TODO: from option.
-const baseUrl = process.env.BASE_URL!;
-
-// TODO: from option.
-const projectKey = process.env.PROJECT_KEY!
+import type { Issue, Project, Options } from "./type";
 
 const createHeaders = (accessToken: string) => ({
   "Content-Type": "application/json",
   "Authorization": `Bearer ${accessToken}`
 });
 
-export const getIssues = async (accessToken: string, keyword: string) => {
-  const project = await getProject(accessToken);
+export const getIssues = async (accessToken: string, options: Options, keyword: string) => {
+  const baseUrl = options.defaultBaseUrl;
+  const projectKey = options.defaultProjectKey;
 
   const url = new URL("/api/v2/issues", baseUrl);
-  url.searchParams.set("projectId[0]", project.id.toString());
+
+  if (projectKey) {
+    const project = await getProject(accessToken, baseUrl, projectKey);
+    url.searchParams.set("projectId[0]", project.id.toString());
+  }
 
   // The number of results is up to 6.
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/omnibox/onInputChanged
@@ -33,7 +32,7 @@ export const getIssues = async (accessToken: string, keyword: string) => {
   return await res.json() as Issue[];
 };
 
-const getProject = async (accessToken: string) => {
+const getProject = async (accessToken: string, baseUrl: string, projectKey: string) => {
   const url = new URL(`/api/v2/projects/${projectKey}`, baseUrl);
 
   const res = await fetch(url.toString(), {

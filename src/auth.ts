@@ -1,14 +1,12 @@
-import type { Tokens } from "./type";
-
-// TODO: from option.
-const baseUrl = process.env.BASE_URL!;
+import type { Tokens, Options } from "./type";
 
 const clientId = process.env.CLIENT_ID!;
 const clientSecret = process.env.CLIENT_SECRET!;
 
 const _browser: typeof browser = require("webextension-polyfill");
 
-export const authorize = async () => {
+export const authorize = async (options: Options) => {
+  const baseUrl = options.defaultBaseUrl;
   const redirectUrl = _browser.identity.getRedirectURL();
   // Firefox: https://567159d622ffbb50b11b0efd307be358624a26ee.extensions.allizom.org/
   // Chrome: https://ahflghaojahgadhdpbeheifnjlaemcld.chromiumapp.org/
@@ -25,10 +23,10 @@ export const authorize = async () => {
   if (!code) {
     throw new Error("No code found.");
   }
-  return await getAccessToken(redirectUrl, code);
+  return await getAccessToken(baseUrl, redirectUrl, code);
 };
 
-const getAccessToken = async (redirectUrl: string, code: string) => {
+const getAccessToken = async (baseUrl: string, redirectUrl: string, code: string) => {
   const url = new URL("/api/v2/oauth2/token", baseUrl);
   const body = new URLSearchParams();
   body.set("grant_type", "authorization_code");

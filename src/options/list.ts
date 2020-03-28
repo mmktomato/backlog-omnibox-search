@@ -7,7 +7,7 @@ export type OnChangeHandler = (key: keyof Options, value: string) => void;
 @customElement("options-list")
 class OptionsList extends LitElement {
   @property({ type: Object })
-  options: Options | null = null;
+  options: Partial<Options> = {};
 
   @property({ type: Function })
   onChange: OnChangeHandler = () => {};
@@ -17,13 +17,13 @@ class OptionsList extends LitElement {
       <div>
         <options-list-item
           label="Default Base Url"
-          value=${this.options?.defaultBaseUrl ?? ""}
+          value=${this.options.defaultBaseUrl ?? ""}
           .onChange=${(value: string) => this.onChange("defaultBaseUrl", value)}
         ></options-list-item>
 
         <options-list-item
           label="Default Project Key"
-          value=${this.options?.defaultProjectKey ?? ""}
+          value=${this.options.defaultProjectKey ?? ""}
           .onChange=${(value: string) => this.onChange("defaultProjectKey", value)}
         ></options-list-item>
       </div>

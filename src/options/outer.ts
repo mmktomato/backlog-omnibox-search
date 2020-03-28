@@ -7,7 +7,7 @@ import { getOptions, setOptions } from "../storage";
 
 @customElement("options-outer")
 class OptionsOuter extends LitElement {
-  private options: Options | null = null;
+  private options: Partial<Options> = {};
 
   async connectedCallback() {
     super.connectedCallback();
@@ -17,10 +17,8 @@ class OptionsOuter extends LitElement {
   }
 
   private handleOnChange(...[key, value]: Parameters<OnChangeHandler>) {
-    if (this.options) {
-      this.options[key] = value.trim();
-      setOptions(this.options);
-    }
+    this.options[key] = value.trim();
+    setOptions(this.options);
   }
 
   render() {

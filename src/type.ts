@@ -26,6 +26,6 @@ export interface Project {
 // app
 
 export interface Options {
-  defaultBaseUrl?: string;
+  defaultBaseUrl: string;
   defaultProjectKey?: string;
 }

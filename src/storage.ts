@@ -22,10 +22,10 @@ export const setTokens = async (tokens: Tokens) => {
 export const getOptions = async () => {
   const options = await _browser.storage.sync.get(["defaultBaseUrl", "defaultProjectKey"]);
 
-  return options as Options;
+  return options as Partial<Options>;
 };
 
-export const setOptions = async (options: Options) => {
+export const setOptions = async (options: Partial<Options>) => {
   await _browser.storage.sync.set({
     defaultBaseUrl: options.defaultBaseUrl,
     defaultProjectKey: options.defaultProjectKey,
