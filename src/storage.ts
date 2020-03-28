@@ -1,4 +1,4 @@
-import { Tokens } from "./type";
+import { Tokens, Options } from "./type";
 
 const _browser: typeof browser = require("webextension-polyfill");
 
@@ -16,5 +16,18 @@ export const setTokens = async (tokens: Tokens) => {
     expiresIn: tokens.expiresIn,
     refreshToken: tokens.refreshToken,
     localTimestamp: tokens.localTimestamp,
+  });
+};
+
+export const getOptions = async () => {
+  const options = await _browser.storage.sync.get(["defaultBaseUrl", "defaultProjectKey"]);
+
+  return options as Options;
+};
+
+export const setOptions = async (options: Options) => {
+  await _browser.storage.sync.set({
+    defaultBaseUrl: options.defaultBaseUrl,
+    defaultProjectKey: options.defaultProjectKey,
   });
 };

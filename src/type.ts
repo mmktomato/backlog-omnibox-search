@@ -22,3 +22,10 @@ export interface Issue {
 export interface Project {
   id: number;
 }
+
+// app
+
+export interface Options {
+  defaultBaseUrl?: string;
+  defaultProjectKey?: string;
+}
