@@ -2,21 +2,40 @@ import { Tokens, Options } from "./type";
 
 const _browser: typeof browser = require("webextension-polyfill");
 
-export const getTokens = async () => {
-  const tokens = await _browser.storage.local.get(["accessToken", "expiresIn", "refreshToken" , "localTimestamp"]);
+type TokensArray = [
+  Tokens["accessToken"],
+  Tokens["expiresIn"],
+  Tokens["refreshToken"],
+  Tokens["localTimestamp"],
+];
 
-  return Object.keys(tokens).length < 1
-    ? null
-    : tokens as Tokens;
+export const getTokens = async (baseUrl: string) => {
+  const key = `${baseUrl}_tokens`;
+  const obj = await _browser.storage.local.get(key);
+
+  if (!obj || !obj[key] || !Array.isArray(obj[key])) {
+    return null;
+  }
+  const arr = obj[key] as TokensArray;
+
+  const tokens: Tokens = {
+    accessToken: arr[0],
+    expiresIn: arr[1],
+    refreshToken: arr[2],
+    localTimestamp: arr[3],
+  };
+  return tokens;
 };
 
-export const setTokens = async (tokens: Tokens) => {
-  await _browser.storage.local.set({
-    accessToken: tokens.accessToken,
-    expiresIn: tokens.expiresIn,
-    refreshToken: tokens.refreshToken,
-    localTimestamp: tokens.localTimestamp,
-  });
+export const setTokens = async (baseUrl: string, tokens: Tokens) => {
+  const key = `${baseUrl}_tokens`;
+  const arr: TokensArray = [
+    tokens.accessToken,
+    tokens.expiresIn,
+    tokens.refreshToken,
+    tokens.localTimestamp,
+  ];
+  await _browser.storage.local.set({ [key]: arr });
 };
 
 export const getOptions = async () => {

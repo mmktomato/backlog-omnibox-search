@@ -26,26 +26,27 @@ _browser.omnibox.onInputStarted.addListener(async () => {
   try {
     setDefaultSuggestion("Checking tokens...");
 
-    const tokens = await getTokens();
-    if (tokens) {
-      if (!isTokenAvailable(tokens)) {
-        setDefaultSuggestion("Refreshing tokens...");
+    const options = await getOptions();
+    if (validateOptions(options)) {
+      const tokens = await getTokens(options.defaultBaseUrl);
+      if (tokens) {
+        if (!isTokenAvailable(tokens)) {
+          setDefaultSuggestion("Refreshing tokens...");
 
-        // TODO: refresh
-        throw new Error("fix this");
-      }
-    } else {
-      const options = await getOptions();
-      if (validateOptions(options)) {
+          // TODO: refresh
+          throw new Error("fix this");
+        }
+        setDefaultSuggestion("Type search keyword.");
+      } else {
         setDefaultSuggestion("Acquiring tokens...");
 
         const newTokens = await authorize(options);
-        await setTokens(newTokens);
+        await setTokens(options.defaultBaseUrl, newTokens);
 
         setDefaultSuggestion("Type search keyword.");
-      } else {
-        setDefaultSuggestion("The configuration is not finished.");
       }
+    } else {
+      setDefaultSuggestion("The configuration is not finished.");
     }
   } catch (ex) {
     handleError(ex);
@@ -59,7 +60,7 @@ const onInputChanged = async (text: string, suggest: (suggestResults: SuggestRes
     if (!validateOptions(options)) {
       return;
     }
-    const tokens = await getTokens();
+    const tokens = await getTokens(options.defaultBaseUrl);
     if (!tokens) {
       return;
     }
@@ -71,7 +72,6 @@ const onInputChanged = async (text: string, suggest: (suggestResults: SuggestRes
       setDefaultSuggestion("Searching...");
 
       const issues = await getIssues(tokens.accessToken, options, keyword);
-      console.log(issues.map(issue => issue.summary));
       const suggestResults = issues.map(issue => ({
         // TODO: I have to escape some chars because `description` can take XML in chrome.
         //       What about Firefox?
