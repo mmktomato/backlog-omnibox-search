@@ -5,6 +5,12 @@ export const validateOptions = (options: Partial<Options>): options is Options =
 };
 
 export const escapeDescription = (description: string) => {
+  // Escape some chars because `description` can take XML in Chrome.
+  // https://developer.chrome.com/extensions/omnibox#type-SuggestResult
+  if (isFirefox()) {
+    return description;
+  }
+
   return description.replace(/[<>&'"]/g, c => {
     switch (c) {
       case "<": return '&lt;';
@@ -16,3 +22,5 @@ export const escapeDescription = (description: string) => {
     return c;
   });
 };
+
+export const isFirefox = () => navigator.userAgent.includes("Firefox");

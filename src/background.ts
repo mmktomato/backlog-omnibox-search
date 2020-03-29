@@ -73,8 +73,6 @@ const onInputChanged = async (text: string, suggest: (suggestResults: SuggestRes
 
       const issues = await getIssues(tokens.accessToken, options, keyword);
       const suggestResults = issues.map(issue => ({
-        // TODO: I have to escape some chars because `description` can take XML in chrome.
-        //       What about Firefox?
         description: escapeDescription(`${issue.issueKey} ${issue.summary}`),
         content: issue.issueKey,
       }));
