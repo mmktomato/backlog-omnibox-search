@@ -26,14 +26,30 @@ export const authorize = async (options: Options) => {
   return await getAccessToken(baseUrl, redirectUrl, code);
 };
 
-const getAccessToken = async (baseUrl: string, redirectUrl: string, code: string) => {
-  const url = new URL("/api/v2/oauth2/token", baseUrl);
+const getAccessToken = (baseUrl: string, redirectUrl: string, code: string) => {
   const body = new URLSearchParams();
   body.set("grant_type", "authorization_code");
   body.set("code", code);
   body.set("redirect_uri", redirectUrl);
   body.set("client_id", clientId);
   body.set("client_secret", clientSecret);
+
+  return postTokenEndpoint(baseUrl, body);
+};
+
+export const refreshAccessToken = (options: Options, tokens: Tokens) => {
+  const baseUrl = options.defaultBaseUrl;
+  const body = new URLSearchParams();
+  body.set("grant_type", "refresh_token");
+  body.set("client_id", clientId);
+  body.set("client_secret", clientSecret);
+  body.set("refresh_token", tokens.refreshToken);
+
+  return postTokenEndpoint(baseUrl, body);
+};
+
+const postTokenEndpoint = async (baseUrl: string, body: URLSearchParams) => {
+  const url = new URL("/api/v2/oauth2/token", baseUrl);
 
   const timestamp = new Date().getTime();
   const res = await fetch(url.toString(), {
@@ -43,13 +59,13 @@ const getAccessToken = async (baseUrl: string, redirectUrl: string, code: string
   });
 
   const obj = await res.json();  // TODO: assertion
-
-  return {
+  const ret: Tokens = {
     accessToken: obj.access_token,
     expiresIn: obj.expires_in,
     refreshToken: obj.refresh_token,
     localTimestamp: timestamp,
-  } as Tokens;
+  };
+  return ret;
 };
 
 export const isTokenAvailable = (tokens: Tokens) => {

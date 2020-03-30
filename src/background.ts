@@ -1,7 +1,7 @@
 import { debounce } from 'ts-debounce';
 
 import type { SuggestResult } from "./type";
-import { authorize, isTokenAvailable } from "./auth";
+import { authorize, refreshAccessToken, isTokenAvailable } from "./auth";
 import { getIssues } from "./backlog";
 import { getTokens, setTokens, getOptions } from "./storage";
 import { validateOptions, escapeDescription } from "./util";
@@ -33,18 +33,16 @@ _browser.omnibox.onInputStarted.addListener(async () => {
         if (!isTokenAvailable(tokens)) {
           setDefaultSuggestion("Refreshing tokens...");
 
-          // TODO: refresh
-          throw new Error("fix this");
+          const newTokens = await refreshAccessToken(options, tokens);
+          await setTokens(options.defaultBaseUrl, newTokens);
         }
-        setDefaultSuggestion("Type search keyword.");
       } else {
         setDefaultSuggestion("Acquiring tokens...");
 
         const newTokens = await authorize(options);
         await setTokens(options.defaultBaseUrl, newTokens);
-
-        setDefaultSuggestion("Type search keyword.");
       }
+      setDefaultSuggestion("Type search keyword.");
     } else {
       setDefaultSuggestion("The configuration is not finished.");
     }
