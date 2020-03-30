@@ -11,14 +11,21 @@ export const authorize = async (options: Options) => {
   // Firefox: https://567159d622ffbb50b11b0efd307be358624a26ee.extensions.allizom.org/
   // Chrome: https://ahflghaojahgadhdpbeheifnjlaemcld.chromiumapp.org/
 
+  const state = Math.floor((Math.random() * 100000000)).toString();
   const url = new URL("/OAuth2AccessRequest.action", baseUrl);
   url.searchParams.set("response_type", "code");
   url.searchParams.set("client_id", clientId);
   url.searchParams.set("redirect_uri", redirectUrl);
-  url.searchParams.set("state", "ssstate");
+  url.searchParams.set("state", state);
 
   const res = await _browser.identity.launchWebAuthFlow({ url: url.toString(), interactive: true });
-  const code = new URL(res).searchParams.get("code");
+  const returnUrl = new URL(res);
+
+  if (returnUrl.searchParams.get("state") !== state) {
+    throw new Error("State not matched.");
+  }
+
+  const code = returnUrl.searchParams.get("code");
 
   if (!code) {
     throw new Error("No code found.");
