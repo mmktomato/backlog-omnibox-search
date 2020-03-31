@@ -23,10 +23,10 @@
   "omnibox": {
     "keyword": "b"
   },
-  "key": "testexamplecomtestexamplecomtest",
+  "key": "c6c86d9a2b464c09b97379b3e0f85b94",
   "browser_specific_settings": {
     "gecko": {
-      "id": "test@example.com"
+      "id": "{515c86c3-df97-40fd-a5a4-d8b44227a7ea}"
     }
   }
 }

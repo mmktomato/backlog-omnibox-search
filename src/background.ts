@@ -97,3 +97,6 @@ _browser.omnibox.onInputEntered.addListener((url, disposition) => {
 // _browser.omnibox.onInputCancelled.addListener(() => {
 //   console.log("onInputCancelled");
 // });
+
+// debug
+console.log(_browser.identity.getRedirectURL());

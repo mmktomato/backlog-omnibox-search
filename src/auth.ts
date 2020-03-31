@@ -8,8 +8,8 @@ const _browser: typeof browser = require("webextension-polyfill");
 export const authorize = async (options: Options) => {
   const baseUrl = options.defaultBaseUrl;
   const redirectUrl = _browser.identity.getRedirectURL();
-  // Firefox: https://567159d622ffbb50b11b0efd307be358624a26ee.extensions.allizom.org/
-  // Chrome: https://ahflghaojahgadhdpbeheifnjlaemcld.chromiumapp.org/
+  // Firefox (development): https://4875c6a5f2e37fdedc9226a5dae93667a342f6e3.extensions.allizom.org/
+  // Chrome (development): https://dlffeeggkjpankabiocfclohbdhpebho.chromiumapp.org/
 
   const state = Math.floor((Math.random() * 100000000)).toString();
   const url = new URL("/OAuth2AccessRequest.action", baseUrl);

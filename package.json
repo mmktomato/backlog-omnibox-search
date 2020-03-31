@@ -2,9 +2,12 @@
   "name": "backlog-omnibox-search",
   "version": "0.0.1",
   "description": "Search backlog issues by your omnibox.",
+  "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "parcel watch src/background.ts src/options/options.html --public-url=/dist"
+    "start": "parcel watch src/background.ts src/options/options.html --public-url=/dist",
+    "build": "npm run clean && npm ci && parcel build src/background.ts src/options/options.html --no-source-maps --no-cache",
+    "clean": "rm -rf node_modules .cache dist"
   },
   "author": "mmktomato",
   "license": "MIT",
