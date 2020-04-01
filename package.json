@@ -6,13 +6,14 @@
   "main": "index.js",
   "scripts": {
     "start": "parcel watch src/background.ts src/options/options.html --public-url=/dist",
-    "build": "npm run clean && npm ci && parcel build src/background.ts src/options/options.html --no-source-maps --no-cache",
+    "build": "parcel build src/background.ts src/options/options.html --no-source-maps --no-cache",
     "clean": "rm -rf node_modules .cache dist"
   },
   "author": "mmktomato",
   "license": "MIT",
   "devDependencies": {
     "@types/firefox-webext-browser": "^70.0.1",
+    "dotenv": "^8.2.0",
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-web-ext-tool": "^0.1.2",
     "typescript": "^3.8.3",
