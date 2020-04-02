@@ -3,3 +3,4 @@
 .env.chrome
 dist/
 node_modules/
+chrome.zip
