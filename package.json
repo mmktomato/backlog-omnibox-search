@@ -1,6 +1,6 @@
 {
   "name": "backlog-omnibox-search",
-  "version": "0.0.1",
+  "version": "0.0.9",
   "description": "Search backlog issues by your omnibox.",
   "private": true,
   "main": "index.js",
