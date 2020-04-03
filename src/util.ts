@@ -24,3 +24,8 @@ export const escapeDescription = (description: string) => {
 };
 
 export const isFirefox = () => navigator.userAgent.includes("Firefox");
+
+export const createIssueUrl = (baseUrl: string, issueKey: string) => {
+  const url = new URL(`/view/${issueKey}`, baseUrl);
+  return url.toString();
+};

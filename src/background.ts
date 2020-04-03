@@ -4,7 +4,7 @@ import type { SuggestResult } from "./type";
 import { authorize, refreshAccessToken, isTokenAvailable } from "./auth";
 import { getIssues } from "./backlog";
 import { getTokens, setTokens, getOptions } from "./storage";
-import { validateOptions, escapeDescription } from "./util";
+import { validateOptions, escapeDescription, createIssueUrl } from "./util";
 
 const _browser: typeof browser = require("webextension-polyfill");
 
@@ -72,7 +72,7 @@ const onInputChanged = async (text: string, suggest: (suggestResults: SuggestRes
       const issues = await getIssues(tokens.accessToken, options, keyword);
       const suggestResults = issues.map(issue => ({
         description: escapeDescription(`${issue.issueKey} ${issue.summary}`),
-        content: issue.issueKey,
+        content: createIssueUrl(options.defaultBaseUrl, issue.issueKey),
       }));
       suggest(suggestResults);
       setDefaultSuggestion("Result of: " + keyword);
@@ -87,8 +87,17 @@ _browser.omnibox.onInputChanged.addListener(onInputChangedDebounced);
 
 _browser.omnibox.onInputEntered.addListener((url, disposition) => {
   try {
-    console.log(`onInputEntered: ${url}`);
-    console.log(`onInputEntered: ${disposition}`);
+    switch (disposition) {
+      case "currentTab":
+        _browser.tabs.update({ url });
+        break;
+      case "newForegroundTab":
+        _browser.tabs.create({ url });
+        break;
+      case "newBackgroundTab":
+        _browser.tabs.create({ url, active: false });
+        break;
+    }
   } catch (ex) {
     handleError(ex);
   }
