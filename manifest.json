@@ -12,7 +12,6 @@
     "128": "icon/icon128.png"
   },
   "options_ui": {
-    "browser_style": true,
     "page": "dist/options/options.html"
   },
   "permissions": [
