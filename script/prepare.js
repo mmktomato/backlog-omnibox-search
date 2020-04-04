@@ -16,7 +16,7 @@ const manifest = JSON.parse(fs.readFileSync(manifestPath, { encoding: "utf8" }))
 
 if (target === "chrome") {
   delete manifest.browser_specific_settings;
-  manifest.key = process.env.MANIFEST_KEY;
+  delete manifest.key;
 }
 
 const content = JSON.stringify(manifest, null, "  ");
