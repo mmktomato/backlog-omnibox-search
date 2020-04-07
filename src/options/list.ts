@@ -1,5 +1,6 @@
-import { LitElement, html, css, customElement, property } from "lit-element";
+import { LitElement, html, customElement, property } from "lit-element";
 
+import "./listItem";
 import { Options } from "../type";
 
 export type OnChangeHandler = (key: keyof Options, value: string) => void;
@@ -18,46 +19,17 @@ class OptionsList extends LitElement {
         <options-list-item
           label="Default Base Url"
           value=${this.options.defaultBaseUrl ?? ""}
+          placeHolder="https://yourspace.backlog.com"
+          required=${true}
           .onChange=${(value: string) => this.onChange("defaultBaseUrl", value)}
         ></options-list-item>
 
         <options-list-item
           label="Default Project Key"
           value=${this.options.defaultProjectKey ?? ""}
+          placeHolder="YOUR_PROJECT_KEY"
           .onChange=${(value: string) => this.onChange("defaultProjectKey", value)}
         ></options-list-item>
-      </div>
-    `;
-  }
-}
-
-@customElement("options-list-item")
-class OptionsListItem extends LitElement {
-  @property()
-  label = "";
-
-  @property()
-  value = "";
-
-  @property({ type: Function })
-  onChange: (value: string) => void = () => {};
-
-  static get styles() {
-    return css`
-      div {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 1em 2em;
-      }
-    `;
-  }
-
-  render() {
-    return html`
-      <div>
-        <span>${this.label}</span>
-        <input value="${this.value}" @change=${(e: any) => this.onChange(e.currentTarget.value)}></input>
       </div>
     `;
   }
