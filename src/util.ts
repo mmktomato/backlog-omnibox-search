@@ -29,3 +29,5 @@ export const createIssueUrl = (baseUrl: string, issueKey: string) => {
   const url = new URL(`/view/${issueKey}`, baseUrl);
   return url.toString();
 };
+
+export const isEmptyTab = (url?: string) => !!url?.startsWith(isFirefox() ? "about:newtab" : "chrome://newtab");

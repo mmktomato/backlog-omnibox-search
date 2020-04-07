@@ -4,7 +4,7 @@ import type { SuggestResult } from "./type";
 import { authorize, refreshAccessToken, isTokenAvailable } from "./auth";
 import { getIssues } from "./backlog";
 import { getTokens, setTokens, getOptions } from "./storage";
-import { validateOptions, escapeDescription, createIssueUrl } from "./util";
+import { validateOptions, escapeDescription, createIssueUrl, isEmptyTab } from "./util";
 
 const _browser: typeof browser = require("webextension-polyfill");
 
@@ -85,8 +85,20 @@ const onInputChangedDebounced = debounce(onInputChanged, 250);
 
 _browser.omnibox.onInputChanged.addListener(onInputChangedDebounced);
 
-_browser.omnibox.onInputEntered.addListener((url, disposition) => {
+_browser.omnibox.onInputEntered.addListener(async (url, disposition) => {
   try {
+    const matchTabs = await _browser.tabs.query({ url });
+    if (0 < matchTabs.length) {
+      const currentTabs = await _browser.tabs.query({ active: true, windowId: _browser.windows.WINDOW_ID_CURRENT });
+
+      if (0 < currentTabs.length && isEmptyTab(currentTabs[0].url)) {
+        _browser.tabs.remove(currentTabs[0].id!);
+      }
+
+      _browser.tabs.update(matchTabs[0].id!, { active: true });
+      return;
+    }
+
     switch (disposition) {
       case "currentTab":
         _browser.tabs.update({ url });
@@ -107,5 +119,4 @@ _browser.omnibox.onInputEntered.addListener((url, disposition) => {
 //   console.log("onInputCancelled");
 // });
 
-// debug
 console.log(_browser.identity.getRedirectURL());
