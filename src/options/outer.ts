@@ -1,9 +1,10 @@
-import { LitElement, html, customElement } from "lit-element";
+import { LitElement, html, customElement, css } from "lit-element";
 
 import "./list";
 import type { OnChangeHandler } from "./list";
 import type { Options } from "../type";
-import { getOptions, setOptions } from "../storage";
+import { setTokens, getOptions, setOptions } from "../storage";
+import { authorize } from "../auth";
 
 @customElement("options-outer")
 class OptionsOuter extends LitElement {
@@ -16,15 +17,37 @@ class OptionsOuter extends LitElement {
     this.requestUpdate();
   }
 
+  static get styles() {
+    return css`
+      .buttonOuter {
+        text-align: right;
+      }
+
+      button {
+        margin: 0.5em 2em;
+      }
+    `;
+  }
+
   private handleOnChange(...[key, value]: Parameters<OnChangeHandler>) {
     this.options[key] = value.trim();
     setOptions(this.options);
+  }
+
+  private async authorize() {
+    if (this.options.defaultBaseUrl) {
+      const newTokens = await authorize(this.options.defaultBaseUrl);
+      await setTokens(this.options.defaultBaseUrl, newTokens);
+    }
   }
 
   render() {
     return html`
       <main>
         <options-list .options=${this.options} .onChange=${this.handleOnChange}></options-list>
+        <div class="buttonOuter">
+          <button @click=${this.authorize}>Authorize</button>
+        </div>
       </main>
     `;
   }

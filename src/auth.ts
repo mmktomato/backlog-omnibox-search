@@ -1,12 +1,11 @@
-import type { Tokens, Options } from "./type";
+import type { Tokens } from "./type";
 
 const clientId = process.env.CLIENT_ID!;
 const clientSecret = process.env.CLIENT_SECRET!;
 
 const _browser: typeof browser = require("webextension-polyfill");
 
-export const authorize = async (options: Options) => {
-  const baseUrl = options.defaultBaseUrl;
+export const authorize = async (baseUrl: string) => {
   const redirectUrl = _browser.identity.getRedirectURL();
   // Firefox (development): https://4875c6a5f2e37fdedc9226a5dae93667a342f6e3.extensions.allizom.org/
   // Chrome (development): https://dlffeeggkjpankabiocfclohbdhpebho.chromiumapp.org/
@@ -44,8 +43,7 @@ const getAccessToken = (baseUrl: string, redirectUrl: string, code: string) => {
   return postTokenEndpoint(baseUrl, body);
 };
 
-export const refreshAccessToken = (options: Options, tokens: Tokens) => {
-  const baseUrl = options.defaultBaseUrl;
+export const refreshAccessToken = (baseUrl: string, tokens: Tokens) => {
   const body = new URLSearchParams();
   body.set("grant_type", "refresh_token");
   body.set("client_id", clientId);

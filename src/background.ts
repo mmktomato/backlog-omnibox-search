@@ -33,13 +33,13 @@ _browser.omnibox.onInputStarted.addListener(async () => {
         if (!isTokenAvailable(tokens)) {
           setDefaultSuggestion("Refreshing tokens...");
 
-          const newTokens = await refreshAccessToken(options, tokens);
+          const newTokens = await refreshAccessToken(options.defaultBaseUrl, tokens);
           await setTokens(options.defaultBaseUrl, newTokens);
         }
       } else {
         setDefaultSuggestion("Acquiring tokens...");
 
-        const newTokens = await authorize(options);
+        const newTokens = await authorize(options.defaultBaseUrl);
         await setTokens(options.defaultBaseUrl, newTokens);
       }
       setDefaultSuggestion("Type search keyword.");
