@@ -1,8 +1,9 @@
 import type { SuggestResult } from "./type";
 import { authorize, refreshAccessToken, isTokenAvailable } from "./auth";
 import { getIssues } from "./backlog";
-import { getTokens, setTokens, getOptions } from "./storage";
+import { getTokens, setTokens, getOptions, setOptions } from "./storage";
 import { validateOptions, escapeDescription, createIssueUrl, isEmptyTab } from "./util";
+import { findLast30DaysBacklogBaseUrl } from "./history";
 
 const _browser: typeof browser = require("webextension-polyfill");
 
@@ -10,7 +11,7 @@ const setDefaultSuggestion = (text: string) => {
   _browser.omnibox.setDefaultSuggestion({ description: text || " " });
 };
 
-const handleError = (ex: unknown) => {
+const handleInputError = (ex: unknown) => {
   console.error(ex);
 
   if (ex instanceof Error) {
@@ -45,7 +46,7 @@ export const onInputStarted = async () => {
     }
     setDefaultSuggestion("Type search keyword.");
   } catch (ex) {
-    handleError(ex);
+    handleInputError(ex);
   }
 };
 
@@ -80,7 +81,7 @@ export const onInputChanged = async (text: string, suggest: (suggestResults: Sug
       setDefaultSuggestion("Result of: " + keyword);
     }
   } catch (ex) {
-    handleError(ex);
+    handleInputError(ex);
   }
 };
 
@@ -115,10 +116,22 @@ export const onInputEntered = async (url: string, disposition: string) => {
         break;
     }
   } catch (ex) {
-    handleError(ex);
+    handleInputError(ex);
   }
 };
 
-export const onStartup = () => {
-  console.log(_browser.identity.getRedirectURL());
+export const onStartup = async () => {
+  try {
+    console.log(_browser.identity.getRedirectURL());
+
+    const options = await getOptions();
+    if (!options.defaultBaseUrl) {
+      const baseUrl = await findLast30DaysBacklogBaseUrl();
+      if (baseUrl) {
+        setOptions({ ...options, defaultBaseUrl: baseUrl });
+      }
+    }
+  } catch (ex) {
+    console.error(ex);
+  }
 };
