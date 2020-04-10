@@ -27,25 +27,25 @@ _browser.omnibox.onInputStarted.addListener(async () => {
     setDefaultSuggestion("Checking tokens...");
 
     const options = await getOptions();
-    if (validateOptions(options)) {
-      const tokens = await getTokens(options.defaultBaseUrl);
-      if (tokens) {
-        if (!isTokenAvailable(tokens)) {
-          setDefaultSuggestion("Refreshing tokens...");
+    if (!validateOptions(options)) {
+      return;
+    }
 
-          const newTokens = await refreshAccessToken(options.defaultBaseUrl, tokens);
-          await setTokens(options.defaultBaseUrl, newTokens);
-        }
-      } else {
-        setDefaultSuggestion("Acquiring tokens...");
+    const tokens = await getTokens(options.defaultBaseUrl);
+    if (tokens) {
+      if (!isTokenAvailable(tokens)) {
+        setDefaultSuggestion("Refreshing tokens...");
 
-        const newTokens = await authorize(options.defaultBaseUrl);
+        const newTokens = await refreshAccessToken(options.defaultBaseUrl, tokens);
         await setTokens(options.defaultBaseUrl, newTokens);
       }
-      setDefaultSuggestion("Type search keyword.");
     } else {
-      setDefaultSuggestion("The configuration is not finished.");
+      setDefaultSuggestion("Acquiring tokens...");
+
+      const newTokens = await authorize(options.defaultBaseUrl);
+      await setTokens(options.defaultBaseUrl, newTokens);
     }
+    setDefaultSuggestion("Type search keyword.");
   } catch (ex) {
     handleError(ex);
   }
@@ -53,9 +53,12 @@ _browser.omnibox.onInputStarted.addListener(async () => {
 
 const onInputChanged = async (text: string, suggest: (suggestResults: SuggestResult[]) => void) => {
   try {
-    // TODO: Do nothing during acquiring token, refreshing token, or configuration.
+    // TODO: Do nothing during acquiring token, refreshing token.
+
     const options = await getOptions();
     if (!validateOptions(options)) {
+      setDefaultSuggestion("The configuration is not finished.");
+      suggest([{ content: "openOptionsPage", description: "Click here to finish configuration." }]);
       return;
     }
     const tokens = await getTokens(options.defaultBaseUrl);
@@ -87,6 +90,11 @@ _browser.omnibox.onInputChanged.addListener(onInputChangedDebounced);
 
 _browser.omnibox.onInputEntered.addListener(async (url, disposition) => {
   try {
+    if (url === "openOptionsPage") {
+      _browser.runtime.openOptionsPage();
+      return;
+    }
+
     const matchTabs = await _browser.tabs.query({ url });
     if (0 < matchTabs.length) {
       const currentTabs = await _browser.tabs.query({ active: true, windowId: _browser.windows.WINDOW_ID_CURRENT });
