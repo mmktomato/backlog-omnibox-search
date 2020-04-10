@@ -17,7 +17,8 @@
   "permissions": [
     "tabs",
     "identity",
-    "storage"
+    "storage",
+    "history"
   ],
   "omnibox": {
     "keyword": "b"
