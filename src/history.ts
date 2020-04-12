@@ -1,6 +1,5 @@
 const _browser: typeof browser = require("webextension-polyfill");
 
-// TODO: unit test
 export const findLast30DaysBacklogBaseUrl = async () => {
   const thirtyDaysAgo = new Date().getTime() - 30 * 24 * 60 * 60 * 1000;
 

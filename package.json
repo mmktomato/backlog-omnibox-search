@@ -6,17 +6,21 @@
   "main": "index.js",
   "scripts": {
     "start": "parcel watch src/background.ts src/options/options.html --public-url=/dist",
+    "test": "jest",
     "build": "parcel build src/background.ts src/options/options.html --public-url=/dist --no-source-maps --no-cache",
     "clean": "rm -rf node_modules .cache dist",
-    "pack": "sh script/build.sh"
+    "pack": "npm run test && sh script/build.sh"
   },
   "author": "mmktomato",
   "license": "MIT",
   "devDependencies": {
     "@types/firefox-webext-browser": "^70.0.1",
+    "@types/jest": "^25.2.1",
     "dotenv": "^8.2.0",
+    "jest": "^25.3.0",
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-web-ext-tool": "^0.1.2",
+    "ts-jest": "^25.3.1",
     "typescript": "^3.8.3",
     "web-ext": "^4.1.0",
     "web-ext-types": "^3.2.1"
