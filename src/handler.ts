@@ -4,6 +4,7 @@ import { getIssues } from "./backlog";
 import { getTokens, setTokens, getOptions, setOptions } from "./storage";
 import { validateOptions, escapeDescription, createIssueUrl, isEmptyTab } from "./util";
 import { findLast30DaysBacklogBaseUrl } from "./history";
+import { parseKeyword } from "./keyword";
 
 const _browser: typeof browser = require("webextension-polyfill");
 
@@ -66,19 +67,19 @@ export const onInputChanged = async (text: string, suggest: (suggestResults: Sug
       return;
     }
 
-    const keyword = text.trim();
-    if (!keyword) {
+    const keywordData = parseKeyword(text);
+    if (!keywordData.keyword) {
       setDefaultSuggestion("Type search keyword.");
     } else {
       setDefaultSuggestion("Searching...");
 
-      const issues = await getIssues(tokens.accessToken, options, keyword);
+      const issues = await getIssues(tokens.accessToken, options, keywordData);
       const suggestResults = issues.map(issue => ({
         description: escapeDescription(`${issue.issueKey} ${issue.summary}`),
         content: createIssueUrl(options.defaultBaseUrl, issue.issueKey),
       }));
       suggest(suggestResults);
-      setDefaultSuggestion("Result of: " + keyword);
+      setDefaultSuggestion("Result of: " + keywordData.keyword);
     }
   } catch (ex) {
     handleInputError(ex);

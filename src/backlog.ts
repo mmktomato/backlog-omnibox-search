@@ -1,13 +1,13 @@
-import type { Issue, Project, Options } from "./type";
+import type { Issue, Project, Options, KeywordData } from "./type";
 
 const createHeaders = (accessToken: string) => ({
   "Content-Type": "application/json",
   "Authorization": `Bearer ${accessToken}`
 });
 
-export const getIssues = async (accessToken: string, options: Options, keyword: string) => {
+export const getIssues = async (accessToken: string, options: Options, keywordData: KeywordData) => {
   const baseUrl = options.defaultBaseUrl;
-  const projectKey = options.defaultProjectKey;
+  const projectKey = keywordData.projectKey || options.defaultProjectKey;
 
   const url = new URL("/api/v2/issues", baseUrl);
 
@@ -20,9 +20,7 @@ export const getIssues = async (accessToken: string, options: Options, keyword: 
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/omnibox/onInputChanged
   url.searchParams.set("count", "6");
 
-  if (keyword) {
-    url.searchParams.set("keyword", keyword);
-  }
+  url.searchParams.set("keyword", keywordData.keyword);
 
   const res = await fetch(url.toString(), {
     method: "GET",

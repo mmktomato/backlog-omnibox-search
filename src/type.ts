@@ -29,3 +29,8 @@ export interface Options {
   defaultBaseUrl: string;
   defaultProjectKey?: string;
 }
+
+export interface KeywordData {
+  keyword: string;
+  projectKey?: string;
+}
