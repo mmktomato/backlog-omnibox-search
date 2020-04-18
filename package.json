@@ -5,9 +5,9 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "parcel watch src/background.ts src/options/options.html --public-url=/dist",
+    "start": "parcel watch src/background.ts src/options/options.html src/popup/popup.html --public-url=/dist",
     "test": "jest",
-    "build": "parcel build src/background.ts src/options/options.html --public-url=/dist --no-source-maps --no-cache",
+    "build": "parcel build src/background.ts src/options/options.html src/popup/popup.html --public-url=/dist --no-source-maps --no-cache",
     "clean": "rm -rf node_modules .cache dist",
     "pack": "npm run test && sh script/build.sh"
   },

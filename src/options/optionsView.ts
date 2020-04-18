@@ -6,8 +6,8 @@ import type { Options } from "../type";
 import { setTokens, getOptions, setOptions } from "../storage";
 import { authorize } from "../auth";
 
-@customElement("options-outer")
-class OptionsOuter extends LitElement {
+@customElement("options-view")
+class OptionsView extends LitElement {
   private options: Partial<Options> = {};
 
   async connectedCallback() {
@@ -43,12 +43,10 @@ class OptionsOuter extends LitElement {
 
   render() {
     return html`
-      <main>
-        <options-list .options=${this.options} .onChange=${this.handleOnChange}></options-list>
-        <div class="buttonOuter">
-          <button @click=${this.authorize}>Authorize</button>
-        </div>
-      </main>
+      <options-list .options=${this.options} .onChange=${this.handleOnChange}></options-list>
+      <div class="buttonOuter">
+        <button @click=${this.authorize}>Authorize</button>
+      </div>
     `;
   }
 }
