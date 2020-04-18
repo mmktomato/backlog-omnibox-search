@@ -1,22 +1,59 @@
 import { LitElement, html, customElement, css } from "lit-element";
 
+const commonStyles = css`
+  table {
+    border: 1px solid #ccc;
+    border-collapse: collapse;
+  }
+  td {
+    border: 1px solid #ccc;
+    padding: .3em .5em;
+  }
+  td.query {
+    white-space: nowrap;
+  }
+  thead {
+    background: #d9d9d9;
+  }
+  code {
+    padding: 0 .5em;
+    border: 1px solid #aaa;
+    border-radius: 2px;
+    background: #eee;
+    font-family: monospace;
+  }
+`;
+
 @customElement("usage-view")
 class UsageView extends LitElement {
   static get styles() {
-    return css`
-      h2 {
-        border-bottom: 1px solid #8e8e8e;
-        font-size: 1.25em;
-      }
-    `;
+    return [
+      commonStyles,
+      css`
+        h2 {
+          font-size: 1.25em;
+        }
+        section {
+          margin-bottom: 30px;
+        }
+        p {
+          padding: .5em;
+        }
+      `,
+    ];
   }
 
   render() {
     return html`
-      <div>
+      <section>
+        <p>
+          Type <code>b</code> and press space key in the address bar. It searches for the issues in Backlog.
+        </p>
+      </section>
+      <section>
         <h2>Example</h2>
         <usage-example></usage-example>
-      </div>
+      </section>
     `;
   }
 }
@@ -24,29 +61,7 @@ class UsageView extends LitElement {
 @customElement("usage-example")
 class UsageExample extends LitElement {
   static get styles() {
-    return css`
-      table {
-        border: 1px solid #ccc;
-        border-collapse: collapse;
-      }
-      td {
-        border: 1px solid #ccc;
-        padding: .3em .5em;
-      }
-      td.query {
-        white-space: nowrap;
-      }
-      thead {
-        background: #d9d9d9;
-      }
-      code {
-        padding: 0 .5em;
-        border: 1px solid #aaa;
-        border-radius: 2px;
-        background: #eee;
-        font-family: monospace;
-      }
-    `;
+    return commonStyles;
   }
 
   render() {
@@ -58,11 +73,11 @@ class UsageExample extends LitElement {
         <tbody>
           <tr>
             <td class="query"><code>b keyword</code></td>
-            <td>Search <code>keyword</code> in the default project. Search in all projects if the default project key is not set.</td>
+            <td>Search by <code>keyword</code> in the default project.<br />Search in all projects if the default project key is not set.</td>
           </tr>
           <tr>
             <td class="query"><code>b keyword proj:MY_PROJ</code></td>
-            <td>Search <code>keyword</code> in <code>MY_PROJ</code> project.</td>
+            <td>Search by <code>keyword</code> in <code>MY_PROJ</code> project.</td>
           </tr>
         </tbody>
       </table>

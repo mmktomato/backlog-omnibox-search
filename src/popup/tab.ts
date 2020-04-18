@@ -31,7 +31,7 @@ class TabContainer extends LitElement {
       .row > li {
         position: relative;
         display: inline-block;
-        padding: 3px 10px 0;
+        padding: 3px 10px 2px;
         z-index: 0;
       }
       .row > li.selected {

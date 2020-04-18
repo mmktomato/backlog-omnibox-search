@@ -18,11 +18,11 @@ class PopupView extends LitElement {
     return html`
       <div>
         <tab-container>
-          <span slot="tab1Name">Settings</span>
-          <options-view slot="tab1Content"></options-view>
+          <span slot="tab1Name">Usage</span>
+          <usage-view slot="tab1Content"></usage-view>
 
-          <span slot="tab2Name">Usage</span>
-          <usage-view slot="tab2Content"></usage-view>
+          <span slot="tab2Name">Settings</span>
+          <options-view slot="tab2Content"></options-view>
         </tab-container>
       </div>
     `;
