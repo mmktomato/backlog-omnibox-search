@@ -1,6 +1,16 @@
-import type { KeywordData } from "./type";
+import type { SearchCondition, Options } from "./type";
 
-export const parseKeyword = (raw: string): KeywordData => {
+export const createSearchCondition = (query: string, options: Options): SearchCondition => {
+  const data = parseKeyword(query);
+
+  return {
+    keyword: data.keyword,
+    baseUrl: options.defaultBaseUrl,
+    projectKey: data.projectKey || options.defaultProjectKey,
+  };
+};
+
+const parseKeyword = (raw: string) => {
   const tokens = normalize(raw);
 
   let projectKey: string | undefined = undefined;

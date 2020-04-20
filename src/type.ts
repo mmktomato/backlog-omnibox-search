@@ -30,7 +30,8 @@ export interface Options {
   defaultProjectKey?: string;
 }
 
-export interface KeywordData {
+export interface SearchCondition {
   keyword: string;
+  baseUrl: string;
   projectKey?: string;
 }

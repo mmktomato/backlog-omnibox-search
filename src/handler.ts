@@ -2,9 +2,9 @@ import type { SuggestResult } from "./type";
 import { authorize, refreshAccessToken, isTokenAvailable } from "./auth";
 import { getIssues } from "./backlog";
 import { getTokens, setTokens, getOptions, setOptions } from "./storage";
-import { validateOptions, escapeDescription, createIssueUrl, isEmptyTab } from "./util";
+import { validateOptions, escapeDescription, createIssueUrl, isEmptyTab, isFirefox } from "./util";
 import { findLast30DaysBacklogBaseUrl } from "./history";
-import { parseKeyword } from "./keyword";
+import { createSearchCondition } from "./keyword";
 
 const _browser: typeof browser = require("webextension-polyfill");
 
@@ -62,24 +62,30 @@ export const onInputChanged = async (text: string, suggest: (suggestResults: Sug
       return;
     }
 
-    const tokens = await getTokens(options.defaultBaseUrl);
+    const condition = createSearchCondition(text, options);
+    const tokens = await getTokens(condition.baseUrl);
     if (!tokens) {
       return;
     }
 
-    const keywordData = parseKeyword(text);
-    if (!keywordData.keyword) {
+    if (!condition.keyword) {
       setDefaultSuggestion("Type search keyword.");
     } else {
       setDefaultSuggestion("Searching...");
 
-      const issues = await getIssues(tokens.accessToken, options, keywordData);
+      const issues = await getIssues(tokens.accessToken, condition);
       const suggestResults = issues.map(issue => ({
         description: escapeDescription(`${issue.issueKey} ${issue.summary}`),
-        content: createIssueUrl(options.defaultBaseUrl, issue.issueKey),
+        content: createIssueUrl(condition.baseUrl, issue.issueKey),
       }));
       suggest(suggestResults);
-      setDefaultSuggestion("Result of: " + keywordData.keyword);
+
+      let message = `Results of: "${condition.keyword}" in ${condition.projectKey ? condition.projectKey : "all projects"}.`;
+      if (!isFirefox()) {
+        // Known issue: Firefox doesn't allow to call `browserAction.openPopup()` in `onInputEntered`.
+        message += " Click here for the usage.";
+      }
+      setDefaultSuggestion(message);
     }
   } catch (ex) {
     handleInputError(ex);
@@ -89,7 +95,15 @@ export const onInputChanged = async (text: string, suggest: (suggestResults: Sug
 export const onInputEntered = async (url: string, disposition: string) => {
   try {
     if (url === "openOptionsPage") {
+      // TODO: open browser action if chrome.
       _browser.runtime.openOptionsPage();
+      return;
+    }
+    if (!url.startsWith("https://")) {
+      if (!isFirefox()) {
+        // Known issue: Firefox causes the error: `Error: browserAction.openPopup may only be called from a user input handler`.
+        _browser.browserAction.openPopup();
+      }
       return;
     }
 

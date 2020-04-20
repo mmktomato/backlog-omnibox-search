@@ -1,15 +1,41 @@
-import { parseKeyword } from "./keyword";
+import { createSearchCondition } from "./keyword";
 
-describe("parseKeyword", () => {
-  const keywordWithoutProjectKey = { keyword: "test1 test2" };
-  const keywordWithProjectKey = { keyword: "test1 test2", projectKey: "KEY" };
+const defaultBaseUrl = "https://a.backlog.com";
+
+describe("createSearchCondition (parse keyword)", () => {
+  const options = { defaultBaseUrl };
+
+  const conditionWithoutProjectKey = {
+    keyword: "test1 test2",
+    baseUrl: defaultBaseUrl,
+  };
+  const conditionWithProjectKey = { ...conditionWithoutProjectKey, projectKey: "KEY" };
 
   it.each`
-    description                  | raw                               | expected
-    ${"without proj"}            | ${"test1 test2"}                  | ${keywordWithoutProjectKey}
-    ${"with proj"}               | ${"proj:KEY test1 test2"}         | ${keywordWithProjectKey}
-    ${"with proj (white space)"} | ${"  proj:  KEY  test1  test2  "} | ${keywordWithProjectKey}
-  `("parses raw keyword ($description).", ({ raw, expected }) => {
-    expect(parseKeyword(raw)).toEqual(expected);
+    description                  | query                             | expected
+    ${"without proj"}            | ${"test1 test2"}                  | ${conditionWithoutProjectKey}
+    ${"with proj"}               | ${"proj:KEY test1 test2"}         | ${conditionWithProjectKey}
+    ${"with proj (white space)"} | ${"  proj:  KEY  test1  test2  "} | ${conditionWithProjectKey}
+  `("parses raw keyword ($description).", ({ query, expected }) => {
+    expect(createSearchCondition(query, options)).toEqual(expected);
+  });
+});
+
+describe("createSearchCondition (project key)", () => {
+  const options = { defaultBaseUrl, defaultProjectKey: "DEFAULT_KEY" };
+
+  const conditionWithDefaultProjectKey = {
+    keyword: "test1 test2",
+    baseUrl: defaultBaseUrl,
+    projectKey: "DEFAULT_KEY",
+  };
+  const conditionWithProjectKey = { ...conditionWithDefaultProjectKey, projectKey: "KEY" };
+
+  it.each`
+    description                  | query                             | expected
+    ${"without proj"}            | ${"test1 test2"}                  | ${conditionWithDefaultProjectKey}
+    ${"with proj"}               | ${"proj:KEY test1 test2"}         | ${conditionWithProjectKey}
+  `("parses raw keyword ($description).", ({ query, expected }) => {
+    expect(createSearchCondition(query, options)).toEqual(expected);
   });
 });

@@ -1,18 +1,16 @@
-import type { Issue, Project, Options, KeywordData } from "./type";
+import type { Issue, Project, SearchCondition } from "./type";
 
 const createHeaders = (accessToken: string) => ({
   "Content-Type": "application/json",
   "Authorization": `Bearer ${accessToken}`
 });
 
-export const getIssues = async (accessToken: string, options: Options, keywordData: KeywordData) => {
-  const baseUrl = options.defaultBaseUrl;
-  const projectKey = keywordData.projectKey || options.defaultProjectKey;
+export const getIssues = async (accessToken: string, condition: SearchCondition) => {
+  const url = new URL("/api/v2/issues", condition.baseUrl);
 
-  const url = new URL("/api/v2/issues", baseUrl);
-
-  if (projectKey) {
-    const project = await getProject(accessToken, baseUrl, projectKey);
+  if (condition.projectKey) {
+    // TODO: better error handling
+    const project = await getProject(accessToken, condition.baseUrl, condition.projectKey);
     url.searchParams.set("projectId[0]", project.id.toString());
   }
 
@@ -20,7 +18,7 @@ export const getIssues = async (accessToken: string, options: Options, keywordDa
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/omnibox/onInputChanged
   url.searchParams.set("count", "6");
 
-  url.searchParams.set("keyword", keywordData.keyword);
+  url.searchParams.set("keyword", condition.keyword);
 
   const res = await fetch(url.toString(), {
     method: "GET",
