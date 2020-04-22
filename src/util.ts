@@ -1,4 +1,4 @@
-import type { Options } from "./type";
+import type { Options, Message } from "./type";
 
 export const validateOptions = (options: Partial<Options>): options is Options => {
   return !!options.defaultBaseUrl;
@@ -31,3 +31,7 @@ export const createIssueUrl = (baseUrl: string, issueKey: string) => {
 };
 
 export const isEmptyTab = (url?: string) => !!url?.startsWith(isFirefox() ? "about:newtab" : "chrome://newtab");
+
+export const isMessage = (message: any): message is Message => {
+  return message != null && typeof(message) === "object" && typeof(message.type) === "number";
+};

@@ -35,3 +35,16 @@ export interface SearchCondition {
   baseUrl: string;
   projectKey?: string;
 }
+
+export interface AppContextDto {
+  readonly popupTabIndex: number;
+}
+
+export enum MessageType {
+  REQUIRE_APP_CONTEXT = 0,
+  UPDATE_APP_CONTEXT__POPUP_TAB_INDEX,
+}
+
+export type Message =
+  { type: MessageType.REQUIRE_APP_CONTEXT } |
+  { type: MessageType.UPDATE_APP_CONTEXT__POPUP_TAB_INDEX, value: number };

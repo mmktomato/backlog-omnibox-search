@@ -1,14 +1,12 @@
 import { LitElement, html, customElement, css, property } from "lit-element";
+import { Message, MessageType, AppContextDto } from "../type";
 
-type OnChangeHandler = (index: number) => void;
+const _browser: typeof browser = require("webextension-polyfill");
 
 @customElement("tab-container")
 class TabContainer extends LitElement {
   @property({ type: Number })
   selectedIndex = 0;
-
-  @property({ type: Function })
-  onChange: OnChangeHandler = () => {};
 
   static get styles() {
     return css`
@@ -44,9 +42,19 @@ class TabContainer extends LitElement {
     `;
   }
 
+  async connectedCallback() {
+    super.connectedCallback();
+
+    const message: Message = { type: MessageType.REQUIRE_APP_CONTEXT };
+    const appContext = await _browser.runtime.sendMessage(message) as AppContextDto;
+    this.selectedIndex = appContext.popupTabIndex;
+  }
+
   onClick(index: number) {
     this.selectedIndex = index;
-    this.onChange(index);
+
+    const message: Message = { type: MessageType.UPDATE_APP_CONTEXT__POPUP_TAB_INDEX, value: index };
+    _browser.runtime.sendMessage(message);
   }
 
   getClassName(index: number) {
