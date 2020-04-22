@@ -1,20 +1,20 @@
-import type { AppContextDto } from "./type";
+import type { AppContextDto, PopupTabKey } from "./type";
 
 class AppContext {
-  private _popupTabIndex = 0;
+  private _popupTabKey: PopupTabKey = "usage";
 
   toDto(): AppContextDto {
     return {
-      popupTabIndex: this._popupTabIndex,
+      popupTabKey: this.popupTabKey,
     };
   }
 
-  get popupTabIndex() {
-    return this._popupTabIndex;
+  get popupTabKey() {
+    return this._popupTabKey;
   }
 
-  set popupTabIndex(value: number) {
-    this._popupTabIndex = value;
+  set popupTabKey(value: PopupTabKey) {
+    this._popupTabKey = value;
   }
 }
 

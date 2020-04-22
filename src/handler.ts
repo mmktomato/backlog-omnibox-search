@@ -5,6 +5,7 @@ import { getTokens, setTokens, getOptions, setOptions } from "./storage";
 import { validateOptions, escapeDescription, createIssueUrl, isEmptyTab, isFirefox } from "./util";
 import { findLast30DaysBacklogBaseUrl } from "./history";
 import { createSearchCondition } from "./keyword";
+import { appContext } from "./context";
 
 const _browser: typeof browser = require("webextension-polyfill");
 
@@ -57,8 +58,8 @@ export const onInputChanged = async (text: string, suggest: (suggestResults: Sug
 
     const options = await getOptions();
     if (!validateOptions(options)) {
-      setDefaultSuggestion("The configuration is not finished.");
-      suggest([{ content: "openOptionsPage", description: "Click here to finish configuration." }]);
+      setDefaultSuggestion("The configuration is not finished. Click here to finish configuration.");
+      appContext.popupTabKey = "setting";
       return;
     }
 
@@ -84,6 +85,7 @@ export const onInputChanged = async (text: string, suggest: (suggestResults: Sug
       if (!isFirefox()) {
         // Known issue: Firefox doesn't allow to call `browserAction.openPopup()` in `onInputEntered`.
         message += " Click here for the usage.";
+        appContext.popupTabKey = "usage";
       }
       setDefaultSuggestion(message);
     }
@@ -94,14 +96,11 @@ export const onInputChanged = async (text: string, suggest: (suggestResults: Sug
 
 export const onInputEntered = async (url: string, disposition: string) => {
   try {
-    if (url === "openOptionsPage") {
-      // TODO: open browser action if chrome.
-      _browser.runtime.openOptionsPage();
-      return;
-    }
     if (!url.startsWith("https://")) {
-      if (!isFirefox()) {
-        // Known issue: Firefox causes the error: `Error: browserAction.openPopup may only be called from a user input handler`.
+      // Known issue: Firefox causes the error: `Error: browserAction.openPopup may only be called from a user input handler`.
+      if (isFirefox()) {
+        _browser.runtime.openOptionsPage();
+      } else {
         _browser.browserAction.openPopup();
       }
       return;

@@ -26,8 +26,8 @@ _browser.runtime.onMessage.addListener((message, _, sendResponse) => {
       sendResponse(appContext.toDto());
       return false;
 
-    case MessageType.UPDATE_APP_CONTEXT__POPUP_TAB_INDEX:
-      appContext.popupTabIndex = message.value;
+    case MessageType.UPDATE_APP_CONTEXT__POPUP_TAB_KEY:
+      appContext.popupTabKey = message.value;
       return false;
 
     default:

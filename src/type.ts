@@ -37,14 +37,16 @@ export interface SearchCondition {
 }
 
 export interface AppContextDto {
-  readonly popupTabIndex: number;
+  readonly popupTabKey: PopupTabKey;
 }
+
+export type PopupTabKey = "usage" | "setting";
 
 export enum MessageType {
   REQUIRE_APP_CONTEXT = 0,
-  UPDATE_APP_CONTEXT__POPUP_TAB_INDEX,
+  UPDATE_APP_CONTEXT__POPUP_TAB_KEY,
 }
 
 export type Message =
   { type: MessageType.REQUIRE_APP_CONTEXT } |
-  { type: MessageType.UPDATE_APP_CONTEXT__POPUP_TAB_INDEX, value: number };
+  { type: MessageType.UPDATE_APP_CONTEXT__POPUP_TAB_KEY, value: PopupTabKey };
