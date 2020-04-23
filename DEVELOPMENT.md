@@ -10,8 +10,7 @@
 1. Run `cp .env.chrome.sample .env.chrome`.
 1. Replace `CLIENT_ID` and `CLIENT_SECRET` in `.env.chrome`.
 1. Remove `chrome.zip` if exists.
-1. Run `npm run pack -- chrome [version]`.
-1-1. The command accepts some variables. See below.
+1. Run `npm run pack -- chrome [version]`. This command accepts some variables. See below.
 1. The artifact is `chrome.zip`.
 
 Note: The build process leaves a docker image named `my/backlog-omnibox-search-build`. Remove it yourself if you want.
