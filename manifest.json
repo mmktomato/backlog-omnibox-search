@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "version": "0.0.13",
+  "version": "0.0.14",
   "name": "Backlog Omnibox Search (alpha)",
-  "description": "Search backlog issues by your omnibox.",
+  "description": "Search Backlog issues in your browser's address bar.",
   "background": {
     "scripts": ["dist/background.js"]
   },

@@ -1,7 +1,7 @@
 {
   "name": "backlog-omnibox-search",
-  "version": "0.0.13",
-  "description": "Search backlog issues by your omnibox.",
+  "version": "0.0.14",
+  "description": "Search Backlog issues in your browser's address bar.",
   "private": true,
   "main": "index.js",
   "scripts": {
