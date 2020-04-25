@@ -35,12 +35,14 @@ export const onInputStarted = async () => {
     const tokens = await getTokens(options.defaultBaseUrl);
     if (tokens) {
       if (!isTokenAvailable(tokens)) {
+        appContext.isAquiringToken = true;
         setDefaultSuggestion("Refreshing tokens...");
 
         const newTokens = await refreshAccessToken(options.defaultBaseUrl, tokens);
         await setTokens(options.defaultBaseUrl, newTokens);
       }
     } else {
+      appContext.isAquiringToken = true;
       setDefaultSuggestion("Acquiring tokens...");
 
       const newTokens = await authorize(options.defaultBaseUrl);
@@ -49,12 +51,16 @@ export const onInputStarted = async () => {
     setDefaultSuggestion("Type search keyword.");
   } catch (ex) {
     handleInputError(ex);
+  } finally {
+    appContext.isAquiringToken = false;
   }
 };
 
 export const onInputChanged = async (text: string, suggest: (suggestResults: SuggestResult[]) => void) => {
   try {
-    // TODO: Do nothing during acquiring token, refreshing token.
+    if (appContext.isAquiringToken) {
+      return;
+    }
 
     const options = await getOptions();
     if (!validateOptions(options)) {
