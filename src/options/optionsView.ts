@@ -1,10 +1,13 @@
+import { debounce } from 'ts-debounce';
 import { LitElement, html, customElement, css } from "lit-element";
 
 import "./list";
-import type { OnChangeHandler } from "./list";
+import type { OnInputHandler } from "./list";
 import type { Options } from "../type";
 import { setTokens, getOptions, setOptions } from "../storage";
 import { authorize } from "../auth";
+
+const setOptionsDebounced = debounce(setOptions, 200);
 
 @customElement("options-view")
 class OptionsView extends LitElement {
@@ -29,9 +32,9 @@ class OptionsView extends LitElement {
     `;
   }
 
-  private handleOnChange(...[key, value]: Parameters<OnChangeHandler>) {
+  private handleOnInput(...[key, value]: Parameters<OnInputHandler>) {
     this.options[key] = value.trim();
-    setOptions(this.options);
+    setOptionsDebounced(this.options);
   }
 
   private async authorize() {
@@ -43,7 +46,7 @@ class OptionsView extends LitElement {
 
   render() {
     return html`
-      <options-list .options=${this.options} .onChange=${this.handleOnChange}></options-list>
+      <options-list .options=${this.options} .onInput=${this.handleOnInput}></options-list>
       <div class="buttonOuter">
         <button @click=${this.authorize}>Authorize</button>
       </div>

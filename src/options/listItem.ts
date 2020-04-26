@@ -15,7 +15,7 @@ class OptionsListItem extends LitElement {
   required = false;
 
   @property({ type: Function })
-  onChange: (value: string) => void = () => {};
+  onInput: (value: string) => void = () => {};
 
   static get styles() {
     return css`
@@ -47,7 +47,7 @@ class OptionsListItem extends LitElement {
         <input
           value=${this.value}
           placeholder=${this.placeHolder}
-          @change=${(e: any) => this.onChange(e.currentTarget.value)}
+          @input=${(e: any) => this.onInput(e.currentTarget.value)}
         ></input>
       </div>
     `;
