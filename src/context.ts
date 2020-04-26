@@ -3,11 +3,11 @@ import type { AppContextDto, PopupTabKey } from "./type";
 class AppContext {
   private _popupTabKey: PopupTabKey = "usage";
   private _isAquiringToken: boolean = false;
+  private _inputId: number = 0;
 
   toDto(): AppContextDto {
     return {
       popupTabKey: this.popupTabKey,
-      isAquiringToken: this.isAquiringToken,
     };
   }
 
@@ -16,6 +16,9 @@ class AppContext {
 
   get isAquiringToken() { return this._isAquiringToken; }
   set isAquiringToken(value: boolean) { this._isAquiringToken = value; }
+
+  get inputId() { return this._inputId; }
+  incrementInputId() { return ++this._inputId; }
 }
 
 export const appContext = new AppContext();

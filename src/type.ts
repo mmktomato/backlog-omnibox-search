@@ -38,7 +38,6 @@ export interface SearchCondition {
 
 export interface AppContextDto {
   readonly popupTabKey: PopupTabKey;
-  readonly isAquiringToken: boolean;
 }
 
 export type PopupTabKey = "usage" | "setting";

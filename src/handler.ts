@@ -80,7 +80,12 @@ export const onInputChanged = async (text: string, suggest: (suggestResults: Sug
     } else {
       setDefaultSuggestion("Searching...");
 
+      const inputId = appContext.incrementInputId();
       const issues = await getIssues(tokens.accessToken, condition);
+      if (inputId !== appContext.inputId) {
+        return;
+      }
+
       const suggestResults = issues.map(issue => ({
         description: escapeDescription(`${issue.issueKey} ${issue.summary}`),
         content: createIssueUrl(condition.baseUrl, issue.issueKey),
