@@ -25,6 +25,7 @@ export const getIssues = async (accessToken: string, condition: SearchCondition)
     headers: createHeaders(accessToken),
   });
 
+  // TODO: validation
   return await res.json() as Issue[];
 };
 
@@ -36,5 +37,6 @@ const getProject = async (accessToken: string, baseUrl: string, projectKey: stri
     headers: createHeaders(accessToken),
   });
 
+  // TODO: validation
   return await res.json() as Project;
 };

@@ -65,7 +65,6 @@ export const onInputChanged = async (text: string, suggest: (suggestResults: Sug
     const options = await getOptions();
     if (!validateOptions(options)) {
       setDefaultSuggestion("The configuration is not finished. Click here to finish configuration.");
-      appContext.popupTabKey = "setting";
       return;
     }
 
@@ -93,11 +92,6 @@ export const onInputChanged = async (text: string, suggest: (suggestResults: Sug
       suggest(suggestResults);
 
       let message = `Results of: "${condition.keyword}" in ${condition.projectKey ? condition.projectKey : "all projects"}.`;
-      if (!isFirefox()) {
-        // Known issue: Firefox doesn't allow to call `browserAction.openPopup()` in `onInputEntered`.
-        message += " Click here for the usage.";
-        appContext.popupTabKey = "usage";
-      }
       setDefaultSuggestion(message);
     }
   } catch (ex) {
@@ -108,12 +102,14 @@ export const onInputChanged = async (text: string, suggest: (suggestResults: Sug
 export const onInputEntered = async (url: string, disposition: string) => {
   try {
     if (!url.startsWith("https://")) {
-      // Known issue: Firefox causes the error: `Error: browserAction.openPopup may only be called from a user input handler`.
-      if (isFirefox()) {
-        _browser.runtime.openOptionsPage();
-      } else {
-        _browser.browserAction.openPopup();
-      }
+      // appContext.popupTabKey = "usage";
+      // appContext.popupTabKey = "setting";
+      // _browser.browserAction.openPopup();
+      //
+      // Firefox 75 : Causes the error: `Error: browserAction.openPopup may only be called from a user input handler`.
+      // Chrome 81  : `browserAction.openPopup` is behind of `chrome://flags`.
+
+      _browser.runtime.openOptionsPage();
       return;
     }
 
