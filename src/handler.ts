@@ -3,7 +3,7 @@ import { authorize, refreshAccessToken, isTokenAvailable } from "./auth";
 import { getIssues } from "./backlog";
 import { getTokens, setTokens, getOptions, setOptions } from "./storage";
 import { validateOptions, escapeDescription, createIssueUrl, isEmptyTab, isFirefox } from "./util";
-import { findLast30DaysBacklogBaseUrl } from "./history";
+import { findLatestBaseUrlAndProjectKey } from "./history";
 import { createSearchCondition } from "./keyword";
 import { appContext } from "./context";
 
@@ -146,10 +146,16 @@ export const onStartup = async () => {
     console.log(_browser.identity.getRedirectURL());
 
     const options = await getOptions();
-    if (!options.defaultBaseUrl) {
-      const baseUrl = await findLast30DaysBacklogBaseUrl();
-      if (baseUrl) {
-        setOptions({ ...options, defaultBaseUrl: baseUrl });
+    if (!options.defaultBaseUrl || !options.defaultProjectKey) {
+      const [baseUrl, projectKey] = await findLatestBaseUrlAndProjectKey(30);
+
+      if (!options.defaultBaseUrl && baseUrl) {
+        options.defaultBaseUrl = baseUrl;
+        await setOptions(options);
+      }
+      if (!options.defaultProjectKey && projectKey) {
+        options.defaultProjectKey = projectKey;
+        await setOptions(options);
       }
     }
   } catch (ex) {

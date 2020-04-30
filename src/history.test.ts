@@ -1,9 +1,9 @@
 jest.mock("webextension-polyfill");
-import { findLast30DaysBacklogBaseUrl } from "./history";
+import { findLatestBaseUrlAndProjectKey } from "./history";
 
 const _browser: typeof browser = require("webextension-polyfill");
 
-describe("findLast30DaysBacklogBaseUrl", () => {
+describe("findLatestBaseUrlAndProjectKey", () => {
   const backlogComHistory = { url: "https://a.backlog.com/dashboard" };
   const backlogJpHistory = { url: "https://a.backlog.jp/dashboard" };
   const backlogtoolComHistory = { url: "https://a.backlogtool.com/dashboard" };
@@ -13,17 +13,19 @@ describe("findLast30DaysBacklogBaseUrl", () => {
     { url: "https://support.backlog.com" },
     { url: "https://support-ja.backlog.com" },
   ];
+  const backlogComIssueHistory = { url: "https://a.backlog.com/view/TEST-1234" };
 
   it.each`
-    description            | histories                                | expected
-    ${"*.backlog.com"}     | ${[backlogComHistory]}                   | ${"https://a.backlog.com"}
-    ${"*.backlog.jp"}      | ${[backlogJpHistory]}                    | ${"https://a.backlog.jp"}
-    ${"*.backlogtool.com"} | ${[backlogtoolComHistory]}               | ${"https://a.backlogtool.com"}
-    ${"ignore"}            | ${ignoreHistories}                       | ${null}
-    ${"first history"}     | ${[backlogJpHistory, backlogComHistory]} | ${"https://a.backlog.jp"}
-  `("returns baseUrl from history ($description).", async ({ histories, expected }) => {
+    description            | histories                                     | expected
+    ${"*.backlog.com"}     | ${[backlogComHistory]}                        | ${["https://a.backlog.com", undefined]}
+    ${"*.backlog.jp"}      | ${[backlogJpHistory]}                         | ${["https://a.backlog.jp", undefined]}
+    ${"*.backlogtool.com"} | ${[backlogtoolComHistory]}                    | ${["https://a.backlogtool.com", undefined]}
+    ${"ignore"}            | ${ignoreHistories}                            | ${[undefined, undefined]}
+    ${"first history"}     | ${[backlogJpHistory, backlogComHistory]}      | ${["https://a.backlog.jp", undefined]}
+    ${"projectKey"}        | ${[backlogJpHistory, backlogComIssueHistory]} | ${["https://a.backlog.jp", "TEST"]}
+  `("returns baseUrl and projectKey from history ($description).", ({ histories, expected }) => {
     (_browser.history.search as jest.Mock).mockResolvedValueOnce(histories);
 
-    expect(await findLast30DaysBacklogBaseUrl()).toEqual(expected);
+    return expect(findLatestBaseUrlAndProjectKey(0)).resolves.toEqual(expected);
   });
 });
