@@ -17,7 +17,7 @@ const handleInputError = (ex: unknown) => {
   console.error(ex);
 
   if (ex instanceof Error) {
-    setDefaultSuggestion(`Error (${ex.name}: ${ex.message}).`);
+    setDefaultSuggestion(`${ex.name}: ${ex.message}`);
   } else {
     setDefaultSuggestion("Unexpected error.");
   }

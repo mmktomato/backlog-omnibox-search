@@ -1,5 +1,34 @@
 import type { Issue, Project, SearchCondition } from "./type";
 
+interface ApiError {
+  errors: {
+    message: string;
+    code: number;
+    moreInfo: string;
+  }[];
+}
+
+const isApiError = (obj: any): obj is ApiError => {
+  return obj && obj.errors && Array.isArray(obj.errors) && 0 < obj.errors.length;
+};
+
+const joinApiErrorMessage = (apiError: ApiError) => {
+  return apiError.errors
+    .map(err => err.moreInfo ? `${err.message} ${err.moreInfo}` : err.message)
+    .join(" / ");
+};
+
+const throwIfError = async (res: Response) => {
+  const body = await res.json();
+
+  if (res.status === 200) {
+    return body;
+  } else if (isApiError(body)) {
+    throw new Error(joinApiErrorMessage(body));
+  }
+  throw new Error(`${res.status} ${res.statusText}`);
+};
+
 const createHeaders = (accessToken: string) => ({
   "Content-Type": "application/json",
   "Authorization": `Bearer ${accessToken}`
@@ -9,7 +38,6 @@ export const getIssues = async (accessToken: string, condition: SearchCondition)
   const url = new URL("/api/v2/issues", condition.baseUrl);
 
   if (condition.projectKey) {
-    // TODO: better error handling
     const project = await getProject(accessToken, condition.baseUrl, condition.projectKey);
     url.searchParams.set("projectId[0]", project.id.toString());
   }
@@ -26,7 +54,7 @@ export const getIssues = async (accessToken: string, condition: SearchCondition)
   });
 
   // TODO: validation
-  return await res.json() as Issue[];
+  return await throwIfError(res) as Issue[];
 };
 
 const getProject = async (accessToken: string, baseUrl: string, projectKey: string) => {
@@ -38,5 +66,5 @@ const getProject = async (accessToken: string, baseUrl: string, projectKey: stri
   });
 
   // TODO: validation
-  return await res.json() as Project;
+  return await throwIfError(res) as Project;
 };

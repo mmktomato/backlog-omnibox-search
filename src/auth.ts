@@ -63,7 +63,7 @@ const postTokenEndpoint = async (baseUrl: string, body: URLSearchParams) => {
     body: body
   });
 
-  const obj = await res.json();  // TODO: assertion
+  const obj = await res.json();  // TODO: assertion. use `throwIfError` in `backlog.ts` ?
   const ret: Tokens = {
     accessToken: obj.access_token,
     expiresIn: obj.expires_in,
