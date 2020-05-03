@@ -1,8 +1,7 @@
 import { debounce } from 'ts-debounce';
 import { onInputStarted, onInputChanged, onInputEntered, onStartup } from "./handler";
-import { MessageType } from "./type";
+import { MessageType, isMessage } from "./type";
 import { appContext } from "./context";
-import { isMessage } from "./util";
 
 const _browser: typeof browser = require("webextension-polyfill");
 

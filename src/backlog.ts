@@ -1,4 +1,4 @@
-import type { Issue, Project, SearchCondition } from "./type";
+import { Issue, isIssue, isProject, SearchCondition } from "./type";
 
 interface ApiError {
   errors: {
@@ -52,9 +52,12 @@ export const getIssues = async (accessToken: string, condition: SearchCondition)
     method: "GET",
     headers: createHeaders(accessToken),
   });
+  const body = await throwIfError(res);
 
-  // TODO: validation
-  return await throwIfError(res) as Issue[];
+  if (body && Array.isArray(body) && body.every(isIssue)) {
+    return body as Issue[];
+  }
+  throw new Error("Unexpected response");
 };
 
 const getProject = async (accessToken: string, baseUrl: string, projectKey: string) => {
@@ -64,7 +67,10 @@ const getProject = async (accessToken: string, baseUrl: string, projectKey: stri
     method: "GET",
     headers: createHeaders(accessToken),
   });
+  const body = await throwIfError(res);
 
-  // TODO: validation
-  return await throwIfError(res) as Project;
+  if (body && isProject(body)) {
+    return body;
+  }
+  throw new Error("Unexpected response");
 };

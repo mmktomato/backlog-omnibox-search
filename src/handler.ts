@@ -1,8 +1,8 @@
-import type { SuggestResult } from "./type";
+import { SuggestResult, validateOptions } from "./type";
 import { authorize, refreshAccessToken, isTokenAvailable } from "./auth";
 import { getIssues } from "./backlog";
 import { getTokens, setTokens, getOptions, setOptions } from "./storage";
-import { validateOptions, escapeDescription, createIssueUrl, isEmptyTab, isFirefox } from "./util";
+import { escapeDescription, createIssueUrl, isEmptyTab, isFirefox } from "./util";
 import { findLatestBaseUrlAndProjectKey } from "./history";
 import { createSearchCondition } from "./keyword";
 import { appContext } from "./context";

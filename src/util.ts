@@ -1,9 +1,5 @@
 import type { Options, Message } from "./type";
 
-export const validateOptions = (options: Partial<Options>): options is Options => {
-  return !!options.defaultBaseUrl;
-};
-
 export const escapeDescription = (description: string) => {
   // Escape some chars because `description` can take XML in Chrome.
   // https://developer.chrome.com/extensions/omnibox#type-SuggestResult
@@ -31,7 +27,3 @@ export const createIssueUrl = (baseUrl: string, issueKey: string) => {
 };
 
 export const isEmptyTab = (url?: string) => !!url?.startsWith(isFirefox() ? "about:newtab" : "chrome://newtab");
-
-export const isMessage = (message: any): message is Message => {
-  return message != null && typeof(message) === "object" && typeof(message.type) === "number";
-};

@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "parcel watch src/background.ts src/options/options.html src/popup/popup.html --public-url=/dist",
-    "test": "jest",
+    "test": "tsc --noEmit && jest",
     "build": "parcel build src/background.ts src/options/options.html src/popup/popup.html --public-url=/dist --no-source-maps --no-cache",
     "clean": "rm -rf node_modules .cache dist",
     "pack": "npm run test && sh script/build.sh"
