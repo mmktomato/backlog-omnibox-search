@@ -1,4 +1,4 @@
-import { Issue, isIssue, isProject, SearchCondition } from "./type";
+import { Issue, isIssue, isProject, SearchCondition } from "../type";
 
 interface ApiError {
   errors: {
@@ -18,7 +18,7 @@ const joinApiErrorMessage = (apiError: ApiError) => {
     .join(" / ");
 };
 
-const throwIfError = async (res: Response) => {
+export const throwIfError = async (res: Response) => {
   const body = await res.json();
 
   if (res.status === 200) {

@@ -1,5 +1,5 @@
 import { SuggestResult, validateOptions } from "./type";
-import { authorize, refreshAccessToken, isTokenAvailable } from "./auth";
+import { authorize, refreshAccessToken, isTokenAvailable } from "./backlog/auth";
 import { getIssues } from "./backlog";
 import { getTokens, setTokens, getOptions, setOptions } from "./storage";
 import { escapeDescription, createIssueUrl, isEmptyTab, isFirefox } from "./util";

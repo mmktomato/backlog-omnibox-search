@@ -1,4 +1,5 @@
-import type { Tokens } from "./type";
+import { Tokens, isTokenResponse } from "../type";
+import { throwIfError } from "./";
 
 const clientId = process.env.CLIENT_ID!;
 const clientSecret = process.env.CLIENT_SECRET!;
@@ -53,7 +54,7 @@ export const refreshAccessToken = (baseUrl: string, tokens: Tokens) => {
   return postTokenEndpoint(baseUrl, body);
 };
 
-const postTokenEndpoint = async (baseUrl: string, body: URLSearchParams) => {
+const postTokenEndpoint = async (baseUrl: string, body: URLSearchParams): Promise<Tokens> => {
   const url = new URL("/api/v2/oauth2/token", baseUrl);
 
   const timestamp = new Date().getTime();
@@ -62,15 +63,17 @@ const postTokenEndpoint = async (baseUrl: string, body: URLSearchParams) => {
     headers: { "Content-Type": "application/x-www-form-urlencoded"},
     body: body
   });
+  const responseBody = await throwIfError(res);
 
-  const obj = await res.json();  // TODO: assertion. use `throwIfError` in `backlog.ts` ?
-  const ret: Tokens = {
-    accessToken: obj.access_token,
-    expiresIn: obj.expires_in,
-    refreshToken: obj.refresh_token,
-    localTimestamp: timestamp,
-  };
-  return ret;
+  if (responseBody && isTokenResponse(responseBody)) {
+    return {
+      accessToken: responseBody.access_token,
+      expiresIn: responseBody.expires_in,
+      refreshToken: responseBody.refresh_token,
+      localTimestamp: timestamp,
+    };
+  }
+  throw new Error("Unexpected response");
 };
 
 export const isTokenAvailable = (tokens: Tokens) => {

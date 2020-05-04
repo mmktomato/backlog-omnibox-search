@@ -33,7 +33,6 @@ const findBacklogUrls = async (days: number, callback: (url: URL) => boolean) =>
   }
 };
 
-// TODO: add unit test
 export const findLatestBaseUrlAndProjectKey = async (days: number) => {
   let baseUrl: string | undefined = undefined;
   let projectKey: string | undefined = undefined;

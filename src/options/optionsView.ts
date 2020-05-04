@@ -5,7 +5,7 @@ import "./list";
 import type { OnInputHandler } from "./list";
 import type { Options } from "../type";
 import { setTokens, getOptions, setOptions } from "../storage";
-import { authorize } from "../auth";
+import { authorize } from "../backlog/auth";
 
 const setOptionsDebounced = debounce(setOptions, 200);
 

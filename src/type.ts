@@ -7,12 +7,18 @@ export interface SuggestResult {
 
 // Backlog
 
-export interface Tokens {
-  accessToken: string;
-  expiresIn: number;
-  refreshToken: string;
-  localTimestamp: number;
+export interface TokenResponse {
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
 }
+
+export const isTokenResponse = (res: any): res is TokenResponse => {
+  return typeof(res) === "object"
+    && typeof(res.access_token) === "string"
+    && typeof(res.expires_in) === "number"
+    && typeof(res.refresh_token) === "string";
+};
 
 export interface Issue {
   summary: string;
@@ -32,6 +38,13 @@ export const isProject = (project: any): project is Project => {
 };
 
 // app
+
+export interface Tokens {
+  accessToken: string;
+  expiresIn: number;
+  refreshToken: string;
+  localTimestamp: number;
+}
 
 export interface Options {
   defaultBaseUrl: string;
