@@ -1,6 +1,6 @@
 const _browser: typeof browser = require("webextension-polyfill");
 
-const findBacklogUrls = async (days: number, callback: (url: URL) => boolean) => {
+const findBacklogUrls = async (days: number, callback: (backlogUrl: URL) => boolean) => {
   const nDaysAgo = new Date().getTime() - days * 24 * 60 * 60 * 1000;
 
   const backlogHistories = await _browser.history.search({
@@ -37,18 +37,19 @@ export const findLatestBaseUrlAndProjectKey = async (days: number) => {
   let baseUrl: string | undefined = undefined;
   let projectKey: string | undefined = undefined;
 
-  await findBacklogUrls(days, (url) => {
-    if (!baseUrl) {
-      baseUrl = `${url.protocol}//${url.hostname}`;
-    }
-
-    if (!projectKey && url.pathname.startsWith("/view/")) {
-      const issueKey = url.pathname.split("/")[2];
-      projectKey = issueKey.split("-")[0];
-    }
+  await findBacklogUrls(days, (backlogUrl) => {
+    [baseUrl, projectKey] = getComponentsFrom(backlogUrl);
 
     return !baseUrl || !projectKey;
   });
+
+  return [baseUrl, projectKey];
+};
+
+const getComponentsFrom = (backlogUrl: URL) => {
+  const baseUrl = `${backlogUrl.protocol}//${backlogUrl.hostname}`;
+  const issueKey = backlogUrl.pathname.startsWith("/view/") ? backlogUrl.pathname.split("/")[2] : undefined;
+  const projectKey = issueKey?.split("-")[0];
 
   return [baseUrl, projectKey];
 };

@@ -16,13 +16,13 @@ describe("findLatestBaseUrlAndProjectKey", () => {
   const backlogComIssueHistory = { url: "https://a.backlog.com/view/TEST-1234" };
 
   it.each`
-    description            | histories                                     | expected
-    ${"*.backlog.com"}     | ${[backlogComHistory]}                        | ${["https://a.backlog.com", undefined]}
-    ${"*.backlog.jp"}      | ${[backlogJpHistory]}                         | ${["https://a.backlog.jp", undefined]}
-    ${"*.backlogtool.com"} | ${[backlogtoolComHistory]}                    | ${["https://a.backlogtool.com", undefined]}
-    ${"ignore"}            | ${ignoreHistories}                            | ${[undefined, undefined]}
-    ${"first history"}     | ${[backlogJpHistory, backlogComHistory]}      | ${["https://a.backlog.jp", undefined]}
-    ${"projectKey"}        | ${[backlogJpHistory, backlogComIssueHistory]} | ${["https://a.backlog.jp", "TEST"]}
+    description                       | histories                                     | expected
+    ${"*.backlog.com"}                | ${[backlogComHistory]}                        | ${["https://a.backlog.com", undefined]}
+    ${"*.backlog.jp"}                 | ${[backlogJpHistory]}                         | ${["https://a.backlog.jp", undefined]}
+    ${"*.backlogtool.com"}            | ${[backlogtoolComHistory]}                    | ${["https://a.backlogtool.com", undefined]}
+    ${"ignore"}                       | ${ignoreHistories}                            | ${[undefined, undefined]}
+    ${"with projectKey"}              | ${[backlogComIssueHistory]}                   | ${["https://a.backlog.com", "TEST"]}
+    ${"gives priority to projectKey"} | ${[backlogJpHistory, backlogComIssueHistory]} | ${["https://a.backlog.com", "TEST"]}
   `("returns baseUrl and projectKey from history ($description).", ({ histories, expected }) => {
     (_browser.history.search as jest.Mock).mockResolvedValueOnce(histories);
 
