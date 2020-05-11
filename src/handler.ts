@@ -146,16 +146,15 @@ export const onStartup = async () => {
     console.log(_browser.identity.getRedirectURL());
 
     const options = await getOptions();
-    if (!options.defaultBaseUrl || !options.defaultProjectKey) {
+    if (!options.defaultBaseUrl) { // Allow empty for defaultProjectKey
       const [baseUrl, projectKey] = await findLatestBaseUrlAndProjectKey(30);
 
-      if (!options.defaultBaseUrl && baseUrl) {
-        options.defaultBaseUrl = baseUrl;
-        await setOptions(options);
-      }
-      if (!options.defaultProjectKey && projectKey) {
-        options.defaultProjectKey = projectKey;
-        await setOptions(options);
+      if (baseUrl) {
+        await setOptions({
+          ...options,
+          defaultBaseUrl: baseUrl,
+          defaultProjectKey: projectKey,
+        });
       }
     }
   } catch (ex) {
