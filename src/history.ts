@@ -33,7 +33,7 @@ const findBacklogUrls = async (days: number, callback: (backlogUrl: URL) => bool
   }
 };
 
-export const findLatestBaseUrlAndProjectKey = async (days: number) => {
+export const findLatestBaseUrlAndProjectKey = async (days: number): Promise<(string | undefined)[]> => {
   let baseUrl: string | undefined = undefined;
   let projectKey: string | undefined = undefined;
 
