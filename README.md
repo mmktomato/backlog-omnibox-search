@@ -1,6 +1,9 @@
 # Backlog Omnibox Search
 Search Backlog issues in your browser's address bar.
 
+https://chrome.google.com/webstore/detail/backlog-omnibox-search-be/bcpimampnadfpnchefddljhfmkpbbkin
+
+# Development
 See [DEVELOPMENT.md](https://github.com/mmktomato/backlog-omnibox-search/blob/master/DEVELOPMENT.md) to see how to develop.
 
 # Icons
